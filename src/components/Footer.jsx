@@ -1,10 +1,13 @@
+'use client';
 import { Link, Button } from "@heroui/react";
 // Gravity UI থেকে প্রয়োজনীয় আইকনগুলো ইম্পোর্ট করা হয়েছে
 import { Globe, ArrowRight } from "@gravity-ui/icons";
 import { FaXTwitter } from "react-icons/fa6";
+import { usePathname } from "next/navigation";
 
 // মডার্ন স্কিল সোয়াপ আইকন লোগো
 const SkillSwapLogo = () => (
+
   <svg
     className="h-6 w-6 text-emerald-500"
     fill="none"
@@ -17,6 +20,10 @@ const SkillSwapLogo = () => (
 );
 
 export default function Footer() {
+    const pathname = usePathname();
+    if (pathname.includes('/dashboard')) {
+        return null;
+    }
   return (
     <footer className="w-full border-t border-slate-900 bg-slate-950 text-slate-400 py-12 px-6 md:px-12">
       <div className="w-11/12 mx-auto grid grid-cols-1 md:grid-cols-4 gap-8 mb-10">

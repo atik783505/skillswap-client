@@ -18,13 +18,25 @@ export const auth = betterAuth({
             role: {
                 type: "string",
                 required: true,
-                defaultValue: "Client",
+                defaultValue: "client",
             },
             isBlocked: {
                 type: "boolean",
                 required: true,
                 defaultValue: false,
             },
+            bio: {
+                type: "string",
+                required: false,
+                defaultValue: "",
+                input: true
+            },
+            skills: {
+                type: "array",
+                required: false,
+                defaultValue: [],
+                input: true
+            }
         },
     },
     socialProviders: {

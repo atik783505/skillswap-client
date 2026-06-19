@@ -33,20 +33,21 @@ export default function App() {
         { name: "Freelancers", href: "/freelancers" },
     ];
 
-    // মডার্ন একটিভ ক্লাস জেনারেটর
     const getLinkClass = (href) => {
         const isActive = pathname === href;
         return `text-sm font-medium transition-all relative py-1.5 px-1 ${isActive
-                ? "text-emerald-400 font-semibold after:absolute after:bottom-0 after:left-0 after:w-full after:h-[2px] after:bg-emerald-500 after:rounded-full"
-                : "text-slate-400 hover:text-emerald-400"
+            ? "text-emerald-400 font-semibold after:absolute after:bottom-0 after:left-0 after:w-full after:h-[2px] after:bg-emerald-500 after:rounded-full"
+            : "text-slate-400 hover:text-emerald-400"
             }`;
     };
+    if (pathname.includes('/dashboard')) {
+        return null;
+    }
 
     return (
         <nav className="sticky top-0 z-50 w-full border-b border-slate-900 bg-slate-950/75 backdrop-blur-md">
             <header className="max-w-7xl mx-auto flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
 
-                {/* লোগো এবং মোবাইল টগল */}
                 <div className="flex items-center gap-4">
                     <button
                         className="md:hidden p-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-900 transition-colors"
@@ -70,8 +71,6 @@ export default function App() {
                         </p>
                     </Link>
                 </div>
-
-                {/* ডেক্সটপ নেভিগেশন মেনু */}
                 <ul className="hidden items-center gap-8 md:flex">
                     {links.map((link) => (
                         <li key={link.href}>
@@ -81,16 +80,14 @@ export default function App() {
                         </li>
                     ))}
                 </ul>
-
-                {/* রাইট সাইড অ্যাকশন সেকশন */}
                 <div className="items-center gap-4 flex">
                     {isPending ? (
                         <div className="h-8 w-20 bg-slate-900 rounded-lg animate-pulse" />
                     ) : user ? (
                         <div className="hidden items-center gap-3 sm:gap-4 sm:flex">
                             <Link
-                                href="/dashboard"
-                                className={`text-sm font-medium transition-colors hidden sm:inline-block ${pathname === "/dashboard" ? "text-emerald-400 font-semibold" : "text-slate-400 hover:text-white"
+                                href={`/dashboard/${user?.role}`}
+                                className={`text-sm font-medium transition-colors hidden sm:inline-block ${pathname === `/dashboard/${user?.role}`? "text-emerald-400 font-semibold" : "text-slate-400 hover:text-white"
                                     }`}
                             >
                                 Dashboard
@@ -120,7 +117,7 @@ export default function App() {
                             </Button>
                         </div>
                     ) : (
-                        /* ❌ ইউজার লগইন না থাকলে ক্ল্যাসিক প্রিমিয়াম লুক */
+                     
                         <div className="flex items-center gap-2 sm:gap-4">
                             <Link href="/auth/signin" className="text-sm font-medium text-slate-400 hover:text-white transition-colors px-2 py-1">
                                 Login
@@ -144,8 +141,8 @@ export default function App() {
                                 <Link
                                     href={link.href}
                                     className={`block py-2.5 px-3 rounded-xl text-base transition-colors ${pathname === link.href
-                                            ? "bg-emerald-500/10 text-emerald-400 font-semibold border-l-4 border-emerald-500"
-                                            : "text-slate-400 hover:bg-slate-900 hover:text-white"
+                                        ? "bg-emerald-500/10 text-emerald-400 font-semibold border-l-4 border-emerald-500"
+                                        : "text-slate-400 hover:bg-slate-900 hover:text-white"
                                         }`}
                                     onClick={() => setIsMenuOpen(false)}
                                 >
@@ -157,8 +154,8 @@ export default function App() {
                         {user && (
                             <li className="border-t border-slate-900 pt-3 mt-2 flex flex-col gap-2">
                                 <Link
-                                    href="/dashboard"
-                                    className={`block py-2.5 px-3 rounded-xl text-base ${pathname === "/dashboard" ? "bg-slate-900 text-emerald-400" : "text-slate-400"}`}
+                                    href={`/dashboard/${user?.role}`}
+                                    className={`block py-2.5 px-3 rounded-xl text-base ${pathname === `/dashboard/${user?.role}` ? "bg-slate-900 text-emerald-400" : "text-slate-400"}`}
                                     onClick={() => setIsMenuOpen(false)}
                                 >
                                     Dashboard ({user.name})
