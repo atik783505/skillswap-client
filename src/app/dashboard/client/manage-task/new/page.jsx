@@ -1,11 +1,13 @@
 import React from 'react';
+import PostTaskForm from './PostTaskForm';
+import { getSessionData } from '@/lib/core/session';
 
-const CreateTask = () => {
+const PostTask = async () => {
     return (
         <div>
-            <h2>Create a New Task</h2>                  
+            <PostTaskForm></PostTaskForm>
         </div>
     );
 };
 
-export default CreateTask;
+export default PostTask;

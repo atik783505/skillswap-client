@@ -1,9 +1,10 @@
+import ClientOverview from '@/components/Dashboard/ClientOverVeiw';
 import React from 'react';
 
 const ClientHome = () => {
     return (
         <div>
-            <h2>Client Home</h2>
+            <ClientOverview></ClientOverview>
         </div>
     );
 };
