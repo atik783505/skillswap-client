@@ -2,7 +2,8 @@
 import React from 'react';
 import { Card, Button } from '@heroui/react';
 import Link from 'next/link';
-import { PencilToLine, TrashBin, Eye, Calendar } from '@gravity-ui/icons'; 
+import { PencilToLine, TrashBin, Eye, Calendar } from '@gravity-ui/icons';
+import toast from 'react-hot-toast';
 
 const MyTasks = ({ tasks = [], onDelete, onEdit }) => {
 
@@ -24,7 +25,7 @@ const MyTasks = ({ tasks = [], onDelete, onEdit }) => {
     return (
         <div className="w-full bg-slate-950 p-4 md:p-8 min-h-screen">
             <Card className="w-full max-w-5xl mx-auto rounded-2xl border border-slate-900 bg-slate-900/40 backdrop-blur-md p-6 shadow-2xl">
-                
+
                 <div className="flex items-center justify-between pb-6 border-b border-slate-900">
                     <div className="flex items-center gap-2">
                         <div className="w-2 h-6 bg-emerald-500 rounded-full" />
@@ -54,7 +55,7 @@ const MyTasks = ({ tasks = [], onDelete, onEdit }) => {
                             ) : (
                                 sortedTasks.map((task) => (
                                     <tr key={task._id} className="group hover:bg-slate-900/20 transition-all duration-150">
-                                        
+
                                         {/* ৩. Title & Deadline Column */}
                                         <td className="py-5 px-4 max-w-[280px] sm:max-w-xs">
                                             <div className="flex flex-col gap-1">
@@ -93,7 +94,18 @@ const MyTasks = ({ tasks = [], onDelete, onEdit }) => {
                                                             isIconOnly
                                                             size="sm"
                                                             variant="light"
-                                                            onClick={() => onDelete && onDelete(task._id)}
+                                                            onClick={async () => {
+                                                                if (!onDelete) return;
+                                                             
+                                                                const res = await onDelete(task._id); 
+
+                                            
+                                                                if (res?.success) {
+                                                                    toast.success('Task deleted successfully!');
+                                                                } else {
+                                                                    toast.error('Failed to delete task');
+                                                                }
+                                                            }}
                                                             className="text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 rounded-lg transition-colors"
                                                             title="Delete Task"
                                                         >

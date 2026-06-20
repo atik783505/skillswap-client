@@ -4,23 +4,28 @@ import { Card, Button } from '@heroui/react';
 import { useSession } from '@/lib/auth-client';
 import Link from 'next/link';
 
-import { 
-    LayoutCellsLarge, 
-    SquareListUl, 
-    ArrowRight, 
-    Bucket, 
-    Plus 
+import {
+    LayoutCellsLarge,
+    SquareListUl,
+    ArrowRight,
+    Bucket,
+    Plus
 } from '@gravity-ui/icons';
 
-const ClientOverview = () => {
+const ClientOverview = ({ tasks = [] }) => {
     const { data } = useSession();
     const user = data?.user;
 
+    const openTasksCount = tasks?.filter(task => task.status === 'open').length || 0;
+    const inProgressTasksCount = tasks?.filter(task => task.status === 'in progress').length || 0;
+
+    const totalSpentAmount = tasks?.reduce((sum, task) => sum + (Number(task.budget) || 0), 0) || 0;
+
     const stats = {
-        totalTasks: 24,
-        openTasks: 8,
-        inProgressTasks: 12,
-        totalSpent: 3450.00
+        totalTasks: tasks.length,
+        openTasks: openTasksCount,         
+        inProgressTasks: inProgressTasksCount, 
+        totalSpent: totalSpentAmount     
     };
 
     return (
@@ -32,7 +37,7 @@ const ClientOverview = () => {
                         Welcome back, <span className="font-semibold text-slate-200">{user?.name || "Alex"}</span>. Here's what's happening with your projects today.
                     </p>
                 </div>
-                
+
                 <Button
                     as={Link}
                     href="/dashboard/client/manage-task/new"

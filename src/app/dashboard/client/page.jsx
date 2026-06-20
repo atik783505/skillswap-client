@@ -1,10 +1,13 @@
 import ClientOverview from '@/components/Dashboard/ClientOverVeiw';
+import { getTasks } from '@/lib/api/tasks';
 import React from 'react';
 
-const ClientHome = () => {
+const ClientHome = async () => {
+    const tasks = await getTasks()
+    console.log(tasks.length)
     return (
         <div>
-            <ClientOverview></ClientOverview>
+            <ClientOverview tasks={tasks}></ClientOverview>
         </div>
     );
 };
