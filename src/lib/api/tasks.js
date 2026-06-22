@@ -6,3 +6,11 @@ export const getTasks = async () => {
     const user = await getSessionData()
     return serverFetch(`/api/tasks?clientId=${user.id}`)
 }
+
+export const getTask = async (id) => {
+    return serverFetch(`/api/tasks/${id}`)
+}
+
+export const getAllTask = async () => {
+    return serverFetch('/api/all-tasks')
+}

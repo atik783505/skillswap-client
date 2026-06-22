@@ -4,6 +4,8 @@ import { Card, Button } from '@heroui/react';
 import Link from 'next/link';
 import { PencilToLine, TrashBin, Eye, Calendar } from '@gravity-ui/icons';
 import toast from 'react-hot-toast';
+import { DeleteAlert } from '@/components/Dashboard/DeleteAlert';
+import { TaskUpdateModal } from '@/components/Dashboard/TaskUpdateModal';
 
 const MyTasks = ({ tasks = [], onDelete, onEdit }) => {
 
@@ -12,6 +14,7 @@ const MyTasks = ({ tasks = [], onDelete, onEdit }) => {
         if (a.status !== 'open' && b.status === 'open') return 1;
         return 0;
     });
+
     const getStatusClass = (status) => {
         const statusClasses = {
             'open': 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20',
@@ -56,18 +59,22 @@ const MyTasks = ({ tasks = [], onDelete, onEdit }) => {
                                 sortedTasks.map((task) => (
                                     <tr key={task._id} className="group hover:bg-slate-900/20 transition-all duration-150">
 
-                                        {/* ৩. Title & Deadline Column */}
-                                        <td className="py-5 px-4 max-w-[280px] sm:max-w-xs">
-                                            <div className="flex flex-col gap-1">
-                                                <span className="font-semibold text-slate-200 group-hover:text-white transition-colors block truncate">
+                                  
+                                        <td className="p-0 max-w-[280px] sm:max-w-xs">
+                                            <Link 
+                                                href={`/dashboard/client/manage-task/${task._id}`}
+                                                className="flex flex-col gap-1 py-5 px-4 w-full h-full block group-hover:text-purple-400 transition-colors"
+                                            >
+                                                <span className="font-semibold text-slate-200 group-hover:text-purple-400 transition-colors block truncate">
                                                     {task.title}
                                                 </span>
                                                 <span className="text-xs text-slate-500 flex items-center gap-1">
                                                     <Calendar className="w-3.5 h-3.5" />
                                                     Deadline: {task.deadline}
                                                 </span>
-                                            </div>
+                                            </Link>
                                         </td>
+
                                         <td className="py-5 px-4 font-bold text-slate-300">
                                             ${Number(task.budget).toLocaleString('en-US', { minimumFractionDigits: 2 })}
                                         </td>
@@ -80,49 +87,22 @@ const MyTasks = ({ tasks = [], onDelete, onEdit }) => {
                                             <div className="flex items-center justify-end gap-2">
                                                 {task.status === 'open' ? (
                                                     <>
-                                                        <Button
-                                                            isIconOnly
-                                                            size="sm"
-                                                            variant="light"
-                                                            onClick={() => onEdit && onEdit(task)}
-                                                            className="text-slate-400 hover:text-purple-400 hover:bg-purple-500/10 rounded-lg transition-colors"
-                                                            title="Edit Task"
-                                                        >
-                                                            <PencilToLine className="w-4 h-4" />
-                                                        </Button>
-                                                        <Button
-                                                            isIconOnly
-                                                            size="sm"
-                                                            variant="light"
-                                                            onClick={async () => {
-                                                                if (!onDelete) return;
-                                                             
-                                                                const res = await onDelete(task._id); 
-
-                                            
-                                                                if (res?.success) {
-                                                                    toast.success('Task deleted successfully!');
-                                                                } else {
-                                                                    toast.error('Failed to delete task');
-                                                                }
-                                                            }}
-                                                            className="text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 rounded-lg transition-colors"
-                                                            title="Delete Task"
-                                                        >
-                                                            <TrashBin className="w-4 h-4" />
-                                                        </Button>
+                                                        {/* 🌟 এডিট এবং ডিলিট এখন সম্পূর্ণ নিরাপদ, লিঙ্কের বাইরে */}
+                                                        <TaskUpdateModal onEdit={onEdit} task={task}></TaskUpdateModal>
+                                                        <DeleteAlert onDelete={onDelete} task={task}></DeleteAlert>
                                                     </>
                                                 ) : (
-                                                    /* 'open' ছাড়া অন্য সব স্ট্যাটাসের (in progress, completed) জন্য শুধু View বাটন থাকবে */
-                                                    <Button
-                                                        isIconOnly
-                                                        size="sm"
-                                                        variant="light"
-                                                        className="text-slate-500 hover:text-slate-300 hover:bg-slate-800 rounded-lg transition-colors"
-                                                        title="View Details"
-                                                    >
-                                                        <Eye className="w-4 h-4" />
-                                                    </Button>
+                                                    <Link href={`/dashboard/client/my-tasks/${task._id}`}>
+                                                        <Button
+                                                            isIconOnly
+                                                            size="sm"
+                                                            variant="light"
+                                                            className="text-slate-500 hover:text-slate-300 hover:bg-slate-800 rounded-lg transition-colors"
+                                                            title="View Details"
+                                                        >
+                                                            <Eye className="w-4 h-4" />
+                                                        </Button>
+                                                    </Link>
                                                 )}
                                             </div>
                                         </td>

@@ -29,7 +29,7 @@ export default function App() {
 
     const links = [
         { name: "Home", href: "/" },
-        { name: "Browse Tasks", href: "/tasks" },
+        { name: "Browse Tasks", href: "/all-tasks" },
         { name: "Freelancers", href: "/freelancers" },
     ];
 

@@ -1,0 +1,102 @@
+import { getTask } from '@/lib/api/tasks';
+import React from 'react';
+import Link from 'next/link';
+import { Card, Button } from '@heroui/react';
+import { Calendar, CircleDollar, ArrowLeft, Tag } from '@gravity-ui/icons';
+
+const TaskDetails = async ({ params }) => {
+    const { id } = await params;
+    const task = await getTask(id);
+
+    const getStatusClass = (status) => {
+        const statusClasses = {
+            'open': 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20',
+            'in progress': 'bg-cyan-500/10 text-cyan-400 border border-cyan-500/20',
+            'completed': 'bg-slate-800 text-slate-400 border border-slate-700'
+        };
+        return statusClasses[status?.toLowerCase()] || 'bg-purple-500/10 text-purple-400 border border-purple-500/20';
+    };
+
+    return (
+        <div className="w-full bg-slate-950 p-4 md:p-8 min-h-screen text-slate-100">
+            <div className="w-full max-w-4xl mx-auto flex flex-col gap-6">
+  
+                <div className="flex items-center justify-between">
+                    <Link href="/dashboard/client/manage-task">
+                        <Button 
+                            size="sm" 
+                            variant="light" 
+                            className="text-slate-400 hover:text-slate-200 hover:bg-slate-900 rounded-xl gap-2 transition-all"
+                        >
+                            <ArrowLeft className="w-4 h-4" />
+                            Back to Tasks
+                        </Button>
+                    </Link>
+                </div>
+
+                <Card className="w-full rounded-2xl border border-slate-900 bg-slate-900/40 backdrop-blur-md p-6 md:p-8 shadow-2xl flex flex-col gap-6">
+
+                    <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 pb-6 border-b border-slate-900">
+                        <div className="flex flex-col gap-2">
+                            <h1 className="text-2xl md:text-3xl font-bold text-slate-100 tracking-tight leading-tight">
+                                {task?.title || 'Loading Task Title...'}
+                            </h1>
+                            <p className="text-xs text-slate-500">Task ID: {id}</p>
+                        </div>
+                        
+                        <div>
+                            <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${getStatusClass(task?.status)}`}>
+                                {task?.status || 'open'}
+                            </span>
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              
+                        <div className="flex items-center gap-4 p-4 rounded-xl border border-slate-900/60 bg-slate-900/20">
+                            <div className="p-3 rounded-lg bg-purple-500/10 text-purple-400 border border-purple-500/20">
+                                <CircleDollar className="w-5 h-5" />
+                            </div>
+                            <div className="flex flex-col">
+                                <span className="text-xs text-slate-500 font-medium uppercase tracking-wider">Budget</span>
+                                <span className="text-lg font-bold text-slate-200">
+                                    ${task?.budget ? Number(task.budget).toLocaleString('en-US', { minimumFractionDigits: 2 }) : '0.00'}
+                                </span>
+                            </div>
+                        </div>
+
+                        <div className="flex items-center gap-4 p-4 rounded-xl border border-slate-900/60 bg-slate-900/20">
+                            <div className="p-3 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                                <Calendar className="w-5 h-5" />
+                            </div>
+                            <div className="flex flex-col">
+                                <span className="text-xs text-slate-500 font-medium uppercase tracking-wider">Deadline</span>
+                                <span className="text-lg font-bold text-slate-200">
+                                    {task?.deadline || 'No deadline set'}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="flex flex-col gap-3 mt-2">
+                        <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-2">
+                            <Tag className="w-4 h-4 text-purple-400" />
+                            Task Description
+                        </h3>
+                        <div className="p-5 rounded-xl border border-slate-900 bg-slate-950/40 text-slate-300 leading-relaxed text-sm whitespace-pre-wrap">
+                            {task?.description || 'No description provided for this task.'}
+                        </div>
+                    </div>
+
+
+                    <div className="mt-4 pt-6 border-t border-slate-900 text-center text-xs text-slate-600 italic">
+                        Additional details and management options can be added here in the future.
+                    </div>
+
+                </Card>
+            </div>
+        </div>
+    );
+};
+
+export default TaskDetails;
