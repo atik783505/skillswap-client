@@ -4,11 +4,14 @@ import { Calendar, Clock, User, Tag, CircleDollar } from '@gravity-ui/icons';
 import ProposalsForm from '@/components/Dashboard/ProposalsForm';
 import { Card } from '@heroui/react';
 import { getSessionData } from '@/lib/core/session';
+import { checkProposalSubmited } from '@/lib/api/proposals';
 
 const SingleTask = async ({ params }) => {
     const { id } = await params;
     const task = await getTask(id);
     const user = await getSessionData()
+    const { submitted } = await checkProposalSubmited(user?.id, task._id)
+    console.log('data is', submitted)
     return (
         <div className="min-h-screen bg-slate-950 p-6 md:p-12 text-slate-100">
             <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -30,7 +33,23 @@ const SingleTask = async ({ params }) => {
                         <h3 className="text-xl font-semibold mb-4 text-white">Description</h3>
                         <p className="text-slate-300 leading-relaxed">{task?.description}</p>
                     </Card>
-                    <ProposalsForm taskId={task._id} user={user}></ProposalsForm>
+                    {user?.role === 'freelancer' ? (
+                        submitted ? (
+                            <div className="p-6 bg-emerald-500/10 border border-emerald-500/20 rounded-2xl flex items-center gap-4 text-emerald-400">
+                                <div className="p-2 bg-emerald-500/20 rounded-full">✅</div>
+                                <div>
+                                    <h4 className="font-bold">Proposal Submitted</h4>
+                                    <p className="text-sm opacity-80">You have already submitted a proposal for this task.</p>
+                                </div>
+                            </div>
+                        ) : (
+                            <ProposalsForm taskId={task._id} user={user} />
+                        )
+                    ) : (
+                        <div className="p-6 bg-slate-900 border border-slate-800 rounded-2xl text-slate-500 text-center">
+                            Only freelancers can submit proposals for this task.
+                        </div>
+                    )}
                 </div>
 
                 <div className="space-y-6">

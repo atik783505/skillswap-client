@@ -38,7 +38,7 @@ export function DashboardSidebar() {
     const freelancerMenuItems = [
         { name: "Overview", href: "/dashboard/freelancer", icon: LuLayoutDashboard },
         { name: "Browse Tasks", href: "/all-tasks", icon: LuSearch },
-        { name: "My Proposals", href: "/dashboard/freelancer/proposals", icon: LuFileSpreadsheet },
+        { name: "My Proposals", href: "/dashboard/freelancer/my-proposals", icon: LuFileSpreadsheet },
         { name: "Active Projects", href: "/dashboard/freelancer/active-projects", icon: LuBriefcase },
         { name: "My Earnings", href: "/dashboard/freelancer/earnings", icon: LuDollarSign },
     ];

@@ -1,10 +1,14 @@
 'use client'
 import React from 'react';
-import { Card, Button, Input, Textarea, Form, TextField, Label, FieldError, TextArea } from '@heroui/react';
+import { Card, Button, Input, Form, TextField, Label, FieldError, TextArea } from '@heroui/react';
+import { makeProposal } from '@/lib/actions/proposals';
+import toast from 'react-hot-toast';
+import { useRouter } from 'next/navigation';
 
-const ProposalsForm = ({ taskId , user}) => {
+const ProposalsForm = ({ taskId, user }) => {
     console.log(user)
-    
+    const router = useRouter()
+
     const onSubmit = async (e) => {
         e.preventDefault();
         const formData = new FormData(e.currentTarget);
@@ -12,13 +16,24 @@ const ProposalsForm = ({ taskId , user}) => {
 
         const finalData = {
             ...data,
+            proposedBudget: parseInt(data.proposedBudget),
+            estimatedDays: parseInt(data.estimatedDays),
             freelancerId: user.id,
             freelancerEmail: user.email,
             taskId,
             status: 'pending'
         }
+        const res = await makeProposal(finalData)
+        if (res.insertedId) {
+            toast.success('Proposal Send Successfully')
+            e.target.reset();
+            router.refresh()
+        } else {
+            toast.error('Failed')
+            return
+        }
 
-        console.log("Proposal Data:", {finalData});
+        console.log("Proposal Data:", { finalData });
     };
     return (
         <div>
