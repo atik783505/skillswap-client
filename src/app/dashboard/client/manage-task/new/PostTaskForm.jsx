@@ -26,7 +26,6 @@ const PostTaskForm = () => {
         e.preventDefault();
         setLoading(true);
 
-        // 🌟 গুরুত্বপূর্ণ ফিক্স: এখানে ভেরিয়েবলটি ডিফাইন করা হলো
         const currentForm = e.currentTarget; 
         const formData = new FormData(currentForm);
         const taskFields = Object.fromEntries(formData.entries());
@@ -48,14 +47,12 @@ const PostTaskForm = () => {
         console.log(finalData);
 
         try {
-            // সার্ভার অ্যাকশন কল
             const res = await postTask(finalData);
             console.log("Server Response:", res);
 
-            // মঙ্গোডিবির রেসপন্স অবজেক্ট কন্ডিশন চেক
             if (res && res.acknowledged) {
                 toast.success('Task Published Successfully');
-                currentForm.reset(); // 💥 এখন এটি পারফেক্টলি রিসেট হবে
+                currentForm.reset(); 
             } else {
                 toast.error(res?.error || 'Error publishing your task');
             }

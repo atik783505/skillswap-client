@@ -1,9 +1,15 @@
+import { getClientProposals } from '@/lib/api/proposals';
+import { getSessionData } from '@/lib/core/session';
 import React from 'react';
+import ManageProposals from './ManageProposals';
 
-const Proposals = () => {
+const Proposals = async () => {
+    const user = await getSessionData()
+    const proposals = await getClientProposals(user.id)
+    console.log(proposals)
     return (
         <div>
-            <h2>Proposals</h2>
+            <ManageProposals proposals={proposals}></ManageProposals>
         </div>
     );
 };

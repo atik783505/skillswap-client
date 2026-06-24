@@ -1,11 +1,16 @@
 import React from 'react';
+import MyProposals from './MyProposals';
+import { getSessionData } from '@/lib/core/session';
+import { getProposals } from '@/lib/api/proposals';
 
-const MyProposals = () => {
+const page = async () => {
+    const user = await getSessionData();
+    const proposals = await getProposals(user?.email);
     return (
         <div>
-            <h2>this is my porpoals page</h2>
+            <MyProposals proposals={proposals}></MyProposals>
         </div>
     );
 };
 
-export default MyProposals;
+export default page;
