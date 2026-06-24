@@ -26,6 +26,7 @@ export default function App() {
 
     const { data: session, isPending } = useSession();
     const user = session?.user || null;
+    console.log(user)
 
     const links = [
         { name: "Home", href: "/" },
