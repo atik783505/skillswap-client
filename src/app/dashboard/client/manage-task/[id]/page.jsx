@@ -115,8 +115,8 @@ const TaskDetails = async ({ params }) => {
 
                                     {/* Ternary Operator দিয়ে স্ট্যাটাস কালার নির্ধারণ */}
                                     <span className={`text-[10px] px-2 py-1 uppercase tracking-wider font-bold ${proposal.status === 'accepted' ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/20' :
-                                            proposal.status === 'rejected' ? 'bg-red-500/20 text-red-400 border border-red-500/20' :
-                                                'bg-amber-500/20 text-amber-400 border border-amber-500/20'
+                                        proposal.status === 'rejected' ? 'bg-red-500/20 text-red-400 border border-red-500/20' :
+                                            'bg-amber-500/20 text-amber-400 border border-amber-500/20'
                                         }`}>
                                         {proposal.status}
                                     </span>
@@ -134,9 +134,18 @@ const TaskDetails = async ({ params }) => {
                                 {/* বাটন কন্ডিশন */}
                                 {proposal.status === 'pending' && (
                                     <div className="flex gap-2 mt-2">
-                                        <Button size="sm" className="bg-emerald-600 text-white rounded-none w-full hover:bg-emerald-700">
-                                            Accept
-                                        </Button>
+                                        <form action={'/api/payment'} method="POST" className="flex gap-2 w-full">
+                                            {/* <input type="hidden" name="proposalId" value={p._id} /> */}
+                                            <input type="hidden" name="task_id" value={id} />
+                                            <input type="hidden" name="client_email" value={task.clientEmail} />
+                                            <input type="hidden" name="freelancer_email" value={proposal.
+                                                freelancerEmail} />
+                                            <input type="hidden" name="amount" value={proposal.proposedBudget} />
+
+                                            <Button type='submit' size="sm" className="bg-emerald-600 text-white rounded-none w-full hover:bg-emerald-700">
+                                                Accept
+                                            </Button>
+                                        </form>
                                         <Button size="sm" className="bg-transparent border border-pink-500 text-pink-500 rounded-none w-full hover:bg-pink-500/10" variant="bordered">
                                             Reject
                                         </Button>
