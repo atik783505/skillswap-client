@@ -87,7 +87,7 @@ const MyTasks = ({ tasks = [], onDelete, onEdit }) => {
                                             <div className="flex items-center justify-end gap-2">
                                                 {task.status === 'open' ? (
                                                     <>
-                                                        {/* 🌟 এডিট এবং ডিলিট এখন সম্পূর্ণ নিরাপদ, লিঙ্কের বাইরে */}
+                                                     
                                                         <TaskUpdateModal onEdit={onEdit} task={task}></TaskUpdateModal>
                                                         <DeleteAlert onDelete={onDelete} task={task}></DeleteAlert>
                                                     </>
