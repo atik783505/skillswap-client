@@ -10,7 +10,8 @@ import {
 } from "@heroui/react";
 import Link from "next/link";
 import { FcGoogle } from "react-icons/fc";
-import { authClient } from "@/lib/auth-client";
+import { authClient, signOut } from "@/lib/auth-client";
+import toast from "react-hot-toast";
 
 export default function Signin({ role }) {
 
@@ -24,32 +25,42 @@ export default function Signin({ role }) {
             password,
         });
 
-        console.log("Sign In Response:", { data, error });
-
         if (error) {
             alert(`Error: ${error.message}`);
-        } else {
-            alert("Logged in successfully!");
-            const userRole = data.user?.role;
-            if (userRole === 'client') {
-                window.location.href = '/';
-            } else {
-                window.location.href = `/dashboard/${userRole}`;
+        } else if (data) {
+            if (data.user?.isBlocked) {
+                await signOut();
+                toast.error("Your account has been blocked by the admin. Please contact support.");
+                return; 
             }
 
+            toast.success("Logged in successfully!");
+            const userRole = data.user?.role;
+            window.location.href = userRole === 'client' ? '/' : `/dashboard/${userRole}`;
         }
     };
 
-    const handleGoogleSignIn = async () => {
-        try {
-            await authClient.signIn.social({
-                provider: "google",
-                callbackURL: "/", // গুগল লগইন সফল হলেও ড্যাশবোর্ডে যাবে
-            });
-        } catch (error) {
+   const handleGoogleSignIn = async () => {
+    try {
+        const { data, error } = await authClient.signIn.social({
+            provider: "google",
+            callbackURL: "/", 
+        });
+
+        if (error) {
             console.error("Google sign in failed:", error);
+            return;
         }
-    };
+        if (data?.user?.isBlocked) {
+            await signOut();
+            toast.error("Your account has been blocked by the admin.");
+            window.location.href = "/auth/signin";
+            return;
+        }   
+    } catch (error) {
+        console.error("Google sign in failed:", error);
+    }
+};
 
     return (
         <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4">

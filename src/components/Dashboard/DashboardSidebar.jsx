@@ -46,7 +46,7 @@ export function DashboardSidebar() {
     const adminMenuItems = [
         { name: "Overview", href: "/dashboard/admin", icon: LuLayoutDashboard },
         { name: "Manage Users", href: "/dashboard/admin/manage-users", icon: LuUsers },
-        { name: "Manage Tasks", href: "/dashboard/admin/manage-tasks", icon: LuClipboardList },
+        { name: "Manage Tasks", href: "/dashboard/admin/manage-task", icon: LuClipboardList },
         { name: "Transactions", href: "/dashboard/admin/transactions", icon: LuHistory },
     ];
 
