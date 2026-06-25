@@ -19,4 +19,8 @@ export const editFreelancerProfile = async (id, data) => {
     }
 }
 
+export const savePaymentAction = async (data) => {
+    return serverMutation('/api/save-payment', data)
+}
+
 
