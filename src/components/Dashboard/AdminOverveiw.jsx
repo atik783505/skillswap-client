@@ -14,7 +14,7 @@ const AdminOverview = ({ stats }) => {
         { title: "TOTAL USERS", value: stats?.totalUsers || "0", icon: Person, color: "text-emerald-400", border: "border-l-emerald-500", trend: "+12%", bg: "bg-emerald-500/10" },
         { title: "TOTAL TASKS", value: stats?.totalTasks || "0", icon: SquareListUl, color: "text-purple-400", border: "border-l-purple-500", trend: "+5.2%", bg: "bg-purple-500/10" },
         { title: "TOTAL REVENUE", value: `$${stats?.totalRevenue || "0"}`, icon: HiOutlineBanknotes, color: "text-rose-400", border: "border-l-rose-500", trend: "+18.4%", bg: "bg-rose-500/10" },
-        { title: "ACTIVE TASKS", value: stats?.activeTasks || "0", icon: FaBolt, color: "text-sky-400", border: "border-l-sky-500", trend: "Active Now", bg: "bg-sky-500/10" },
+        { title: "ACTIVE TASKS", value: stats?.inProgressTasks || "0", icon: FaBolt, color: "text-sky-400", border: "border-l-sky-500", trend: "Active Now", bg: "bg-sky-500/10" },
     ];
 
     return (

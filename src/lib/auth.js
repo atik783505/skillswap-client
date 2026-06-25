@@ -36,7 +36,13 @@ export const auth = betterAuth({
                 required: false,
                 defaultValue: [],
                 input: true
-            }
+            },
+            hourlyRate: {
+                type: "number",
+                required: false,
+                defaultValue: 0,
+                input: true
+            },
         },
     },
     socialProviders: {
