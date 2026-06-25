@@ -1,9 +1,10 @@
+import AdminOverview from '@/components/Dashboard/AdminOverveiw';
 import React from 'react';
 
 const AdminPage = () => {
     return (
         <div>
-            <h2>this admin</h2>
+            <AdminOverview></AdminOverview>
         </div>
     );
 };

@@ -16,7 +16,7 @@ export default function UserTable({ initialUsers }) {
     };
 
     return (
-        <Card className="bg-slate-900 border border-slate-800 p-4">
+        <Card className="bg-slate-900/40 border border-slate-800 p-4">
             <table className="w-full text-left border-collapse">
                 <thead>
                     <tr className="text-slate-400 border-b border-slate-800">

@@ -14,3 +14,15 @@ export const blockUser = async (id , data) => {
         return { success: false, message: error.message };
     }
 }
+
+export const deleteAdminTask = async (id) => {
+    try {
+        const res = await serverMutation(`/api/manage-tasks/${id}`, null, 'DELETE');
+        revalidatePath('/dashboard/admin/manage-task'); 
+        
+        return { success: true, data: res };
+    } catch (error) {
+        console.error(error);
+        return { success: false, message: error.message };
+    }
+}
