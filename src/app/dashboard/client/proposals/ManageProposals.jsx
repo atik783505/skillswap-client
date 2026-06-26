@@ -44,12 +44,12 @@ const ManageProposals = ({ proposals }) => {
                                 {p.status === 'pending' ? (
                                     <>
                                         <form action={'/api/payment'} method="POST" className="flex gap-2 w-full">
-                                            {/* <input type="hidden" name="proposalId" value={p._id} /> */}
+
                                             <input type="hidden" name="task_id" value={p.taskId} />
                                             <input type="hidden" name="client_email" value={p.freelancerInfo.email} />
                                             <input type="hidden" name="freelancer_email" value={p.taskDetails.clientEmail} />
                                             <input type="hidden" name="amount" value={p.proposedBudget} />
-
+                                            <input type="hidden" name="proposal_id" value={p._id.toString()} />
                                             <Button
                                                 type="submit"
                                                 className="flex-1 font-semibold bg-emerald-500 hover:bg-emerald-400 text-slate-950 rounded-sm"
@@ -66,11 +66,14 @@ const ManageProposals = ({ proposals }) => {
                                     </>
                                 ) : (
                                     <Chip
-                                        className={p.status === 'accepted' ? "bg-green-500/20 text-green-400 rounded-md w-full justify-center" : "bg-red-500/20 text-red-400 rounded-md w-full justify-center"}
                                         radius="sm"
+                                        className={`w-full justify-center ${p.status === 'accepted'
+                                                ? "bg-green-500/20 text-green-400"
+                                                : "bg-red-500/20 text-red-400"
+                                            }`}
                                         startContent={p.status === 'accepted' ? <Check size={14} /> : <Xmark size={14} />}
                                     >
-                                        {p.status.toUpperCase()}
+                                        {p.status === 'accepted' ? "ACCEPTED" : "REJECTED"}
                                     </Chip>
                                 )}
                             </div>

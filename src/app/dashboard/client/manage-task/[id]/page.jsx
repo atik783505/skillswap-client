@@ -131,16 +131,17 @@ const TaskDetails = async ({ params }) => {
                                     {proposal.coverNote}
                                 </p>
 
-                                {/* বাটন কন্ডিশন */}
+                    
                                 {proposal.status === 'pending' && (
                                     <div className="flex gap-2 mt-2">
                                         <form action={'/api/payment'} method="POST" className="flex gap-2 w-full">
-                                            {/* <input type="hidden" name="proposalId" value={p._id} /> */}
+    
                                             <input type="hidden" name="task_id" value={id} />
                                             <input type="hidden" name="client_email" value={task.clientEmail} />
                                             <input type="hidden" name="freelancer_email" value={proposal.
                                                 freelancerEmail} />
                                             <input type="hidden" name="amount" value={proposal.proposedBudget} />
+                                            <input type="hidden" name="proposal_id" value={proposal._id.toString()} />
 
                                             <Button type='submit' size="sm" className="bg-emerald-600 text-white rounded-none w-full hover:bg-emerald-700">
                                                 Accept

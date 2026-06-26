@@ -17,6 +17,7 @@ export default async function Success({ searchParams }) {
       client_email: session.metadata.client_email,
       freelancer_email: session.metadata.freelancer_email,
       task_id: session.metadata.task_id,
+      proposal_id:session.metadata.proposal_id,
       amount: parseFloat(session.metadata.amount),
       transaction_id: session.id,
       payment_status: session.payment_status
@@ -52,7 +53,7 @@ export default async function Success({ searchParams }) {
 
           {/* Action Button */}
           <a 
-            href="/dashboard/client/my-tasks" 
+            href="/dashboard/client" 
             className="block w-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold py-3 rounded-lg transition-all"
           >
             Go to Dashboard

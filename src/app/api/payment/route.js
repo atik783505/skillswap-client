@@ -7,11 +7,17 @@ export async function POST(request) {
     const headersList = await headers();
     const origin = headersList.get("origin");
     const formData = await request.formData();
-    
+
     const client_email = formData.get('client_email');
     const freelancer_email = formData.get('freelancer_email');
     const task_id = formData.get('task_id');
     const amount = formData.get('amount');
+    const proposal_id = formData.get('proposal_id')
+    console.log("Proposal ID received from form:", proposal_id); // এটি চেক করুন
+
+    if (!proposal_id) {
+      console.error("Critical Error: proposal_id is missing from FormData!");
+    }
 
     const session = await stripe.checkout.sessions.create({
       customer_email: client_email,
@@ -28,6 +34,7 @@ export async function POST(request) {
         freelancer_email,
         task_id,
         amount: String(amount),
+        proposal_id
       },
       mode: "payment",
       success_url: `${origin}/success?session_id={CHECKOUT_SESSION_ID}`,
