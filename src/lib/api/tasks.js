@@ -11,6 +11,6 @@ export const getTask = async (id) => {
     return serverFetch(`/api/tasks/${id}`)
 }
 
-export const getAllTask = async () => {
-    return serverFetch('/api/all-tasks')
+export const getAllTask = async (page) => {
+    return serverFetch(`/api/all-tasks?page=${page}`)
 }

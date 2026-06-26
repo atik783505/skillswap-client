@@ -10,7 +10,7 @@ import {
 } from "@heroui/react";
 import Link from "next/link";
 import { FcGoogle } from "react-icons/fc";
-import { authClient, signOut } from "@/lib/auth-client";
+import { authClient, signOut} from "@/lib/auth-client";
 import toast from "react-hot-toast";
 
 export default function Signin({ role }) {
@@ -39,6 +39,8 @@ export default function Signin({ role }) {
             window.location.href = userRole === 'client' ? '/' : `/dashboard/${userRole}`;
         }
     };
+
+
 
    const handleGoogleSignIn = async () => {
     try {
