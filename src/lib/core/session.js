@@ -7,3 +7,10 @@ export const getSessionData = async () => {
     })
     return data?.user
 }
+
+export const getToken = async()=>{
+  const token = await auth.api.getToken({
+    headers: await headers(),
+  });
+  return token ? token.token : {}
+}
