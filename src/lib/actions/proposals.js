@@ -18,6 +18,17 @@ export const editFreelancerProfile = async (id, data) => {
         return { success: false, message: error.message };
     }
 }
+export const setDeliveryLink = async (data) => {
+    try {
+        const res = await serverMutation('/api/proposals/complete-task', data, 'PATCH');
+        revalidatePath('/dashboard/freelancer/active-projects');
+
+        return { success: true, data: res };
+    } catch (error) {
+        console.error(error);
+        return { success: false, message: error.message };
+    }
+}
 
 export const savePaymentAction = async (data) => {
     return serverMutation('/api/save-payment', data)
