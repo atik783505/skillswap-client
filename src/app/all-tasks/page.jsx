@@ -6,12 +6,11 @@ import React from 'react';
 
 const AllTasks = async ({searchParams}) => {
     const params = await searchParams
-    console.log(params)
-    const taskData = await getAllTask(params.page);
-    const tasks = taskData.data
-    const pages = taskData.page
-    const totalPages = taskData.totalPage
-
+    const currentPage = Number(params.page) || 1;
+    const taskData = await getAllTask(currentPage);
+    const tasks = taskData?.data || []; 
+    const totalPages = taskData?.totalPage || 1;
+   
     return (
         <div className="w-full bg-slate-950 p-6 md:p-10 min-h-screen">
             <div className="max-w-7xl mx-auto">
@@ -27,7 +26,7 @@ const AllTasks = async ({searchParams}) => {
                     <p className="text-slate-500 text-center mt-20">No tasks found.</p>
                 )}
             </div>
-            <PaginationBasic pages={pages} totalPages={totalPages}></PaginationBasic>
+            <PaginationBasic pages={currentPage} totalPages={totalPages} baseRoute={'/all-tasks'}></PaginationBasic>
         </div>
     );
 };

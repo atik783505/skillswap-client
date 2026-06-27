@@ -1,14 +1,19 @@
 import DeleteTaskButton from '@/components/Dashboard/DeleteButton';
+import PaginationBasic from '@/components/pagination/Pagination';
 import { getAllTask } from '@/lib/api/tasks';
 
 
-const ManageAllTask = async () => {
-    const allTask = await getAllTask();
+const ManageAllTask = async ({ searchParams }) => {
+    const params = await searchParams
+    const currentPage = Number(params.page) || 1;
+    const taskData = await getAllTask(currentPage);
+    const allTask = taskData?.data || [];
+    const totalPages = taskData?.totalPage || 1;
 
     return (
         <div className="p-6 min-h-screen text-slate-200">
             <h2 className="text-2xl font-bold text-white mb-6">Manage All Tasks</h2>
-            
+
             <div className="overflow-x-auto bg-slate-900/40 rounded-xl">
                 <table className="w-full text-left border-collapse border border-slate-800 rounded-xl overflow-hidden shadow-lg">
                     <thead className="bg-slate-900/50">
@@ -42,6 +47,7 @@ const ManageAllTask = async () => {
                     </tbody>
                 </table>
             </div>
+            <PaginationBasic pages={currentPage} totalPages={totalPages} baseRoute={'/dashboard/admin/manage-task'}></PaginationBasic>
         </div>
     );
 };

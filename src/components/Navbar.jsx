@@ -65,7 +65,7 @@ export default function App() {
             <Button
                 size="sm"
                 variant="flat"
-                isLoading={isLoggingOut} 
+                isLoading={isLoggingOut}
                 onClick={handleSignOut}
                 className="bg-rose-500/10 hover:bg-rose-500 text-rose-400 hover:text-white border border-rose-500/20 font-semibold px-3 h-8 text-xs rounded-xl"
             >
@@ -87,7 +87,19 @@ export default function App() {
                     </Link>
                 </div>
                 <ul className="hidden items-center gap-8 md:flex">
-                    {links.map((link) => <li key={link.href}><Link href={link.href} className="text-sm text-slate-400 hover:text-emerald-400">{link.name}</Link></li>)}
+                    {links.map((link) => {
+                        const isActive = pathname === link.href;
+                        return (
+                            <li key={link.href}>
+                                <Link
+                                    href={link.href}
+                                    className={`text-sm transition-colors ${isActive ? "text-emerald-400 font-semibold" : "text-slate-400 hover:text-white"}`}
+                                >
+                                    {link.name}
+                                </Link>
+                            </li>
+                        );
+                    })}
                 </ul>
 
                 <div className="items-center gap-4 flex">
