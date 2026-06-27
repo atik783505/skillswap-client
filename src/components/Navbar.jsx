@@ -16,9 +16,25 @@ const SkillSwapLogo = () => (
 
 export default function App() {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [isLoggingOut, setIsLoggingOut] = useState(false);
     const pathname = usePathname();
     const { data: session, isPending } = useSession();
     const user = session?.user || null;
+
+
+    const handleSignOut = async () => {
+        setIsLoggingOut(true);
+        try {
+            await signOut({
+                fetchOptions: {
+                    onSuccess: () => window.location.reload()
+                }
+            });
+        } catch (error) {
+            console.error("Logout failed", error);
+            setIsLoggingOut(false);
+        }
+    }
 
     const links = [
         { name: "Home", href: "/" },
@@ -46,8 +62,14 @@ export default function App() {
                 </Avatar>
             </Link>
 
-            <Button size="sm" variant="light" onClick={async () => await signOut({ fetchOptions: { onSuccess: () => window.location.reload() } })} className="bg-rose-500/10 hover:bg-rose-500 text-rose-400 hover:text-white border border-rose-500/20 font-semibold px-3 h-8 text-xs rounded-xl">
-                <FiLogOut className="text-sm shrink-0" />
+            <Button
+                size="sm"
+                variant="flat"
+                isLoading={isLoggingOut} 
+                onClick={handleSignOut}
+                className="bg-rose-500/10 hover:bg-rose-500 text-rose-400 hover:text-white border border-rose-500/20 font-semibold px-3 h-8 text-xs rounded-xl"
+            >
+                {!isLoggingOut && <FiLogOut className="text-sm shrink-0" />}
             </Button>
         </>
         ;

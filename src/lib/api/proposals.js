@@ -18,3 +18,7 @@ export const getClientProposals = async (id) => {
 export const getTaskProposals = async (id) => {
     return serverFetch(`/api/proposals/${id}`)
 }
+
+export const getAllFreelancer = async () => {
+    return serverFetch('/api/freelancerInfo' , false)
+}
