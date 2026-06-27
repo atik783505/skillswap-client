@@ -38,7 +38,7 @@ export function TaskUpdateModal({ task, onEdit }) {
 
     return (
         <Modal>
-            {/* 🌟 ট্রিগার বাটন আগের মতোই আনটাচড */}
+    
             <Modal.Trigger>
                 <Button
                     isIconOnly
@@ -53,7 +53,6 @@ export function TaskUpdateModal({ task, onEdit }) {
 
             <Modal.Backdrop className="backdrop-blur-sm bg-black/50">
                 <Modal.Container placement="auto">
-                    {/* 🌟 ডায়ালগ ব্যাকগ্রাউন্ড bg-slate-950 এবং বর্ডার ম্যাচ করা হয়েছে */}
                     <Modal.Dialog className="sm:max-w-3xl bg-slate-950 text-slate-100 border border-slate-900 rounded-2xl shadow-2xl">
                         <Modal.CloseTrigger className="text-slate-500 hover:text-slate-300 transition-colors" />
 
@@ -78,14 +77,14 @@ export function TaskUpdateModal({ task, onEdit }) {
                                     {/* Task Title */}
                                     <TextField defaultValue={task?.title} name="title" isRequired className="w-full flex flex-col gap-2">
                                         <Label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Task Title</Label>
-                                        {/* 🌟 ইনপুট ফিল্ড ডার্ক স্ল্যাট করা হয়েছে */}
+            
                                         <Input className="rounded-xl border border-slate-900 bg-slate-900/50 text-slate-200 placeholder:text-slate-600 focus:border-purple-500/50 transition-all h-11" placeholder="Enter task title" />
                                     </TextField>
 
                                     {/* Description */}
                                     <TextField defaultValue={task?.description} name="description" isRequired className="w-full flex flex-col gap-2">
                                         <Label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Task Description</Label>
-                                        {/* 🌟 টেক্সট-এরিয়া ডার্ক স্ল্যাট করা হয়েছে */}
+                        
                                         <TextArea className="rounded-xl border border-slate-900 bg-slate-900/50 text-slate-200 placeholder:text-slate-600 focus:border-purple-500/50 transition-all min-h-[120px] p-3" placeholder="Describe the task workflow or requirements" />
                                     </TextField>
 

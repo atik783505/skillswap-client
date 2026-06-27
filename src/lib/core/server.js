@@ -2,13 +2,17 @@ import { getToken } from "./session";
 
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL
 
-export const serverFetch = async (path) => {
-    const token = await getToken()
-    const res = await fetch(`${baseUrl}${path}`, {
-        headers: {
-            'Content-Type': 'application/json',
-            authorization: `Bearer ${token}`
+export const serverFetch = async (path, requireAuth = true) => {
+    let headers = { 'Content-Type': 'application/json' };
+
+    if (requireAuth) {
+        const token = await getToken();
+        if (token) {
+            headers['authorization'] = `Bearer ${token}`;
         }
+    }
+    const res = await fetch(`${baseUrl}${path}`, {
+        headers: headers
     });
     return res.json();
 }

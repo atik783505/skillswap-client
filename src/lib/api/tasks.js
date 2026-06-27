@@ -12,5 +12,5 @@ export const getTask = async (id) => {
 }
 
 export const getAllTask = async (page) => {
-    return serverFetch(`/api/all-tasks?page=${page}`)
+    return serverFetch(`/api/all-tasks?page=${page}` , false)
 }
