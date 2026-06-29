@@ -2,20 +2,19 @@ import { getTask } from '@/lib/api/tasks';
 import React from 'react';
 import Link from 'next/link';
 import { Card, Button } from '@heroui/react';
-import { Calendar, CircleDollar, ArrowLeft, Tag } from '@gravity-ui/icons';
+import { Calendar, CircleDollar, ArrowLeft, Tag, Link as LinkIcon } from '@gravity-ui/icons';
 import { getTaskProposals } from '@/lib/api/proposals';
 
 const TaskDetails = async ({ params }) => {
     const { id } = await params;
     const task = await getTask(id);
-    const proposals = await getTaskProposals(id)
-    console.log(proposals)
+    const proposals = await getTaskProposals(id);
 
     const getStatusClass = (status) => {
         const statusClasses = {
             'open': 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20',
             'in progress': 'bg-cyan-500/10 text-cyan-400 border border-cyan-500/20',
-            'completed': 'bg-slate-800 text-slate-400 border border-slate-700'
+            'completed': 'bg-emerald-500 text-slate-950 font-bold'
         };
         return statusClasses[status?.toLowerCase()] || 'bg-purple-500/10 text-purple-400 border border-purple-500/20';
     };
@@ -55,7 +54,6 @@ const TaskDetails = async ({ params }) => {
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-
                         <div className="flex items-center gap-4 p-4 rounded-xl border border-slate-900/60 bg-slate-900/20">
                             <div className="p-3 rounded-lg bg-purple-500/10 text-purple-400 border border-purple-500/20">
                                 <CircleDollar className="w-5 h-5" />
@@ -81,6 +79,26 @@ const TaskDetails = async ({ params }) => {
                         </div>
                     </div>
 
+                    {task?.deliverable_url && (
+                        <div className="flex flex-col gap-3 p-5 rounded-xl border border-emerald-500/30 bg-emerald-500/5 mt-2">
+                            <h3 className="text-sm font-semibold text-emerald-400 uppercase tracking-wider flex items-center gap-2">
+                                <LinkIcon className="w-4 h-4" />
+                                Submitted Work Deliverable
+                            </h3>
+                            <p className="text-xs text-slate-400">
+                                The freelancer has marked this project as complete. You can review the submission using the link below:
+                            </p>
+                            <a 
+                                href={task.deliverable_url} 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className="text-sm text-emerald-400 hover:text-emerald-300 underline font-medium break-all mt-1"
+                            >
+                                {task.deliverable_url}
+                            </a>
+                        </div>
+                    )}
+
                     <div className="flex flex-col gap-3 mt-2">
                         <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-2">
                             <Tag className="w-4 h-4 text-purple-400" />
@@ -91,30 +109,28 @@ const TaskDetails = async ({ params }) => {
                         </div>
                     </div>
 
-
                     <div className="mt-4 pt-6 border-t border-slate-900 text-center text-xs text-slate-600 italic">
                         Additional details and management options can be added here in the future.
                     </div>
 
                 </Card>
             </div>
-            <div className="mt-8">
+            <div className="w-full max-w-4xl mx-auto mt-8">
                 <h2 className="text-xl font-bold text-slate-100 mb-4 flex items-center gap-2">
                     Proposals ({proposals?.length || 0})
                 </h2>
 
-                <div className="flex flex-col gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {proposals?.map((proposal) => (
-                        <Card key={proposal._id} className="p-5 border border-slate-900 bg-slate-900/40 rounded-none shadow-none max-w-96">
+                        <Card key={proposal._id} className="p-5 border border-slate-900 bg-slate-900/40 rounded-xl shadow-none">
                             <div className="flex flex-col gap-3">
                                 <div className="flex justify-between items-start">
                                     <div>
-                                        <p className="font-semibold text-slate-200">{proposal.freelancerEmail}</p>
+                                        <p className="font-semibold text-slate-200 truncate max-w-[200px]">{proposal.freelancerEmail}</p>
                                         <p className="text-xs text-slate-500">Submitted: {new Date(proposal.createdAt).toLocaleDateString()}</p>
                                     </div>
 
-                                    {/* Ternary Operator দিয়ে স্ট্যাটাস কালার নির্ধারণ */}
-                                    <span className={`text-[10px] px-2 py-1 uppercase tracking-wider font-bold ${proposal.status === 'accepted' ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/20' :
+                                    <span className={`text-[10px] px-2 py-1 uppercase tracking-wider font-bold rounded-sm ${proposal.status === 'accepted' ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/20' :
                                         proposal.status === 'rejected' ? 'bg-red-500/20 text-red-400 border border-red-500/20' :
                                             'bg-amber-500/20 text-amber-400 border border-amber-500/20'
                                         }`}>
@@ -127,27 +143,24 @@ const TaskDetails = async ({ params }) => {
                                     <p>Time: <span className="text-white font-bold">{proposal.estimatedDays} Days</span></p>
                                 </div>
 
-                                <p className="text-sm text-slate-400 italic bg-slate-950/50 p-3 border border-slate-800 rounded-none">
+                                <p className="text-sm text-slate-400 italic bg-slate-950/50 p-3 border border-slate-800 rounded-lg">
                                     {proposal.coverNote}
                                 </p>
 
-                    
                                 {proposal.status === 'pending' && (
                                     <div className="flex gap-2 mt-2">
                                         <form action={'/api/payment'} method="POST" className="flex gap-2 w-full">
-    
                                             <input type="hidden" name="task_id" value={id} />
                                             <input type="hidden" name="client_email" value={task.clientEmail} />
-                                            <input type="hidden" name="freelancer_email" value={proposal.
-                                                freelancerEmail} />
+                                            <input type="hidden" name="freelancer_email" value={proposal.freelancerEmail} />
                                             <input type="hidden" name="amount" value={proposal.proposedBudget} />
                                             <input type="hidden" name="proposal_id" value={proposal._id.toString()} />
 
-                                            <Button type='submit' size="sm" className="bg-emerald-600 text-white rounded-none w-full hover:bg-emerald-700">
+                                            <Button type='submit' size="sm" className="bg-emerald-600 text-white rounded-xl w-full hover:bg-emerald-700 font-semibold">
                                                 Accept
                                             </Button>
                                         </form>
-                                        <Button size="sm" className="bg-transparent border border-pink-500 text-pink-500 rounded-none w-full hover:bg-pink-500/10" variant="bordered">
+                                        <Button size="sm" className="bg-transparent border border-pink-500 text-pink-500 rounded-xl w-full hover:bg-pink-500/10 font-semibold" variant="bordered">
                                             Reject
                                         </Button>
                                     </div>
@@ -158,7 +171,7 @@ const TaskDetails = async ({ params }) => {
                 </div>
 
                 {proposals?.length === 0 && (
-                    <div className="p-8 border border-dashed border-slate-800 text-center text-slate-600 rounded-none">
+                    <div className="p-8 border border-dashed border-slate-800 text-center text-slate-600 rounded-xl">
                         No proposals received yet.
                     </div>
                 )}

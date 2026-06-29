@@ -1,5 +1,5 @@
-'use client';
-import React from 'react';
+"use client";
+import React, { useEffect, useState } from 'react';
 import { Card, Button } from '@heroui/react';
 import { useSession } from '@/lib/auth-client';
 import Link from 'next/link';
@@ -17,6 +17,11 @@ import BudgetOverviewChart from './OverviewRecharts/ClientBarCharts';
 const ClientOverview = ({ tasks = [] }) => {
     const { data } = useSession();
     const user = data?.user;
+    const [isMounted, setIsMounted] = useState(false);
+
+    useEffect(() => {
+        setIsMounted(true);
+    }, []);
 
     const stats = {
         totalTasks: tasks.length,
@@ -33,6 +38,8 @@ const ClientOverview = ({ tasks = [] }) => {
         { title: "IN PROGRESS", value: stats.inProgressTasks, icon: ArrowRight, color: "text-sky-400", border: "border-l-sky-500", trend: "Active", bg: "bg-sky-500/10" },
         { title: "TOTAL SPENT", value: `$${stats.totalSpent.toLocaleString('en-US', { minimumFractionDigits: 2 })}`, icon: Bucket, color: "text-indigo-400", border: "border-l-indigo-500", trend: "Paid", bg: "bg-indigo-500/10" },
     ];
+
+    if (!isMounted) return null;
 
     return (
         <div className="w-full p-4 md:p-8 bg-slate-950 min-h-screen text-slate-100">

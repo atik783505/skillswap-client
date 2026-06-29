@@ -78,9 +78,11 @@ const ManageProposals = ({ proposals }) => {
                                                 ? "bg-green-500/20 text-green-400"
                                                 : "bg-red-500/20 text-red-400"
                                             }`}
-                                        startContent={p.status === 'accepted' ? <Check size={14} /> : <Xmark size={14} />}
                                     >
-                                        {p.status === 'accepted' ? "ACCEPTED" : "REJECTED"}
+                                        <div className="flex items-center gap-1.5 justify-center">
+                                            {p.status === 'accepted' ? <Check size={14} /> : <Xmark size={14} />}
+                                            <span>{p.status === 'accepted' ? "ACCEPTED" : "REJECTED"}</span>
+                                        </div>
                                     </Chip>
                                 )}
                             </div>
