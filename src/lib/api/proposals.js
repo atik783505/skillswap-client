@@ -30,3 +30,10 @@ export const getFreelancer = async (id) => {
 export const getTopFreelancer = async () => {
     return serverFetch('/api/top-freelancers' , false)
 }
+
+export const getFreelancerEarnings = async (email) => {
+    return serverFetch (`/api/freelancer-earings?email=${email}`,{
+        cache: 'no-store', 
+        next: { revalidate: 0 }
+    })
+}

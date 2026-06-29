@@ -11,6 +11,8 @@ import {
     Bucket,
     Plus
 } from '@gravity-ui/icons';
+import TaskStatusChart from './OverviewRecharts/ClientPieCharts';
+import BudgetOverviewChart from './OverviewRecharts/ClientBarCharts';
 
 const ClientOverview = ({ tasks = [] }) => {
     const { data } = useSession();
@@ -20,7 +22,9 @@ const ClientOverview = ({ tasks = [] }) => {
         totalTasks: tasks.length,
         openTasks: tasks.filter(t => t.status === 'open').length,
         inProgressTasks: tasks.filter(t => t.status === 'in progress').length,
-        totalSpent: tasks.reduce((sum, t) => sum + (Number(t.budget) || 0), 0)
+        totalSpent: tasks
+            .filter(t => t.status === 'in progress')
+            .reduce((sum, t) => sum + (Number(t.budget) || 0), 0)
     };
 
     const dashboardStats = [
@@ -66,6 +70,10 @@ const ClientOverview = ({ tasks = [] }) => {
                         </div>
                     </Card>
                 ))}
+            </div>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 py-8">
+                <TaskStatusChart stats={stats} />
+                <BudgetOverviewChart tasks={tasks} />
             </div>
         </div>
     );

@@ -46,7 +46,7 @@ export function DashboardSidebar() {
             { name: "Browse Tasks", href: "/all-tasks", icon: LuSearch },
             { name: "My Proposals", href: "/dashboard/freelancer/my-proposals", icon: LuFileSpreadsheet },
             { name: "Active Projects", href: "/dashboard/freelancer/active-projects", icon: LuBriefcase },
-            { name: "My Earnings", href: "/dashboard/freelancer/earnings", icon: LuDollarSign },
+            { name: "My Earnings", href: "/dashboard/freelancer/my-earnings", icon: LuDollarSign },
             { name: "Edit Profile", href: "/dashboard/freelancer/edit-profile", icon: PersonPencil },
         ],
         admin: [
