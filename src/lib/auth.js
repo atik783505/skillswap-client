@@ -4,7 +4,7 @@ import { mongodbAdapter } from "better-auth/adapters/mongodb";
 import { jwt } from "better-auth/plugins";
 
 const client = new MongoClient(process.env.MONGODB_URI);
-const db = client.db('skillswap'); // ডাটাবেসের নাম
+const db = client.db('skillswap');
 
 export const auth = betterAuth({
     database: mongodbAdapter(db, {
@@ -13,6 +13,7 @@ export const auth = betterAuth({
     }),
     emailAndPassword: {
         enabled: true,
+        minPasswordLength: 6,
     },
     user: {
         additionalFields: {

@@ -21,7 +21,6 @@ export default function App() {
     const { data: session, isPending } = useSession();
     const user = session?.user || null;
 
-
     const handleSignOut = async () => {
         setIsLoggingOut(true);
         try {
@@ -42,37 +41,41 @@ export default function App() {
         { name: "Freelancers", href: "/freelancers" },
     ];
 
-    const UserActions =
-        <>
+    // ড্যাশবোর্ড ও প্রোফাইল অ্যাকশনস (ডেস্কটপ ও মোবাইলের জন্য আলাদা ফ্লেক্স লেআউট সাপোর্ট সহ)
+    const UserActions = (
+        <div className="flex items-center gap-4 w-full justify-between sm:justify-start sm:w-auto">
             <Link
                 href={`/dashboard/${user?.role}`}
                 className={`flex items-center gap-2 text-sm font-medium transition-colors ${pathname === `/dashboard/${user?.role}`
                     ? "text-emerald-400 font-semibold"
                     : "text-slate-400 hover:text-white"
                     }`}
+                onClick={() => setIsMenuOpen(false)}
             >
                 <MdOutlineSpaceDashboard size={20} />
                 <span>Dashboard</span>
             </Link>
 
-            <Link href="/my-profile">
-                <Avatar className="cursor-pointer transition-transform hover:scale-105">
-                    <Avatar.Image alt={user?.name || "User"} src={user?.image || "https://img.heroui.chat/image/avatar?w=400&h=400&u=3"} />
-                    <Avatar.Fallback>{user?.name ? user.name.slice(0, 2).toUpperCase() : "US"}</Avatar.Fallback>
-                </Avatar>
-            </Link>
+            <div className="flex items-center gap-3">
+                <Link href="/my-profile" onClick={() => setIsMenuOpen(false)}>
+                    <Avatar className="cursor-pointer transition-transform hover:scale-105">
+                        <Avatar.Image referrerPolicy="no-referrer" alt={user?.name || "User"} src={user?.image || "https://img.heroui.chat/image/avatar?w=400&h=400&u=3"} />
+                        <Avatar.Fallback>{user?.name ? user.name.slice(0, 2).toUpperCase() : "US"}</Avatar.Fallback>
+                    </Avatar>
+                </Link>
 
-            <Button
-                size="sm"
-                variant="flat"
-                isLoading={isLoggingOut}
-                onClick={handleSignOut}
-                className="bg-rose-500/10 hover:bg-rose-500 text-rose-400 hover:text-white border border-rose-500/20 font-semibold px-3 h-8 text-xs rounded-xl"
-            >
-                {!isLoggingOut && <FiLogOut className="text-sm shrink-0" />}
-            </Button>
-        </>
-        ;
+                <Button
+                    size="sm"
+                    variant="flat"
+                    isLoading={isLoggingOut}
+                    onClick={handleSignOut}
+                    className="bg-rose-500/10 hover:bg-rose-500 text-rose-400 hover:text-white border border-rose-500/20 font-semibold px-3 h-8 text-xs rounded-xl"
+                >
+                    {!isLoggingOut && <FiLogOut className="text-sm shrink-0" />}
+                </Button>
+            </div>
+        </div>
+    );
 
     if (pathname.includes('/dashboard')) return null;
 
@@ -86,6 +89,7 @@ export default function App() {
                         <p className="font-bold text-xl text-white">Skill<span className="text-emerald-400">Swap</span></p>
                     </Link>
                 </div>
+                
                 <ul className="hidden items-center gap-8 md:flex">
                     {links.map((link) => {
                         const isActive = pathname === link.href;
@@ -103,14 +107,17 @@ export default function App() {
                 </ul>
 
                 <div className="items-center gap-4 flex">
-                    {isPending ? <div className="h-8 w-20 bg-slate-900 rounded-lg animate-pulse" /> : user ? (
+                    {isPending ? (
+                        <div className="h-8 w-20 bg-slate-900 rounded-lg animate-pulse" />
+                    ) : user ? (
                         <div className="hidden sm:flex items-center gap-4">{UserActions}</div>
                     ) : (
                         <div className="hidden sm:flex items-center gap-4">
-                            <Link href="/auth/signin" className="text-sm text-slate-400">Login</Link>
-                            <Link href="/auth/signup" className="bg-emerald-500 text-slate-950 px-4 py-2 rounded-xl text-sm font-bold">Get Started</Link>
+                            <Link href="/auth/signin" className="text-sm text-slate-400 hover:text-white transition-colors">Login</Link>
+                            <Link href="/auth/signup" className="bg-emerald-500 text-slate-950 px-4 py-2 rounded-xl text-sm font-bold hover:bg-emerald-600 transition-colors">Get Started</Link>
                         </div>
                     )}
+                    
                     <button
                         className="md:hidden p-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-900 ml-2"
                         onClick={() => setIsMenuOpen(!isMenuOpen)}
@@ -123,14 +130,40 @@ export default function App() {
             </header>
 
             {isMenuOpen && (
-                <div className="border-t border-slate-900 bg-slate-950 p-4 md:hidden flex flex-col gap-4">
-                    {links.map((link) => <Link key={link.href} href={link.href} className="text-slate-400" onClick={() => setIsMenuOpen(false)}>{link.name}</Link>)}
-                    {user && <div className="border-t border-slate-800 pt-4 flex items-center justify-between">{UserActions}</div>}
-
-                    <Link href="/auth/signin" className="text-sm text-slate-400">
-                        <Button className='bg-emerald-500'>
-                            Login
-                        </Button></Link>
+                <div className="border-t border-slate-900 bg-slate-950 p-4 md:hidden flex flex-col gap-4 animate-in fade-in duration-200">
+                    {links.map((link) => (
+                        <Link 
+                            key={link.href} 
+                            href={link.href} 
+                            className={`text-sm transition-colors ${pathname === link.href ? "text-emerald-400 font-semibold" : "text-slate-400"}`} 
+                            onClick={() => setIsMenuOpen(false)}
+                        >
+                            {link.name}
+                        </Link>
+                    ))}
+                    
+                    {user ? (
+                        <div className="border-t border-slate-900 pt-4 w-full">
+                            {UserActions}
+                        </div>
+                    ) : (
+                        <div className="border-t border-slate-900 pt-4 flex flex-col gap-3">
+                            <Link 
+                                href="/auth/signin" 
+                                className="w-full text-center text-sm text-slate-400 py-2 border border-slate-800 rounded-xl hover:text-white transition-colors"
+                                onClick={() => setIsMenuOpen(false)}
+                            >
+                                Login
+                            </Link>
+                            <Link 
+                                href="/auth/signup" 
+                                className="w-full text-center bg-emerald-500 text-slate-950 px-4 py-2 rounded-xl text-sm font-bold hover:bg-emerald-600 transition-colors"
+                                onClick={() => setIsMenuOpen(false)}
+                            >
+                                Get Started
+                            </Link>
+                        </div>
+                    )}
                 </div>
             )}
         </nav>

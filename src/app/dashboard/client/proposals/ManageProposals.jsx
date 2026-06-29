@@ -1,11 +1,17 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, Button, Avatar, Chip } from "@heroui/react";
 import { Person, Check, Xmark, Briefcase } from "@gravity-ui/icons";
 
 const ManageProposals = ({ proposals }) => {
     const [data, setData] = useState(proposals);
-    console.log(proposals)
+    const [isMounted, setIsMounted] = useState(false);
+
+    useEffect(() => {
+        setIsMounted(true);
+    }, []);
+
+    if (!isMounted) return null;
 
     return (
         <div className="p-4 md:p-8 bg-slate-950 min-h-screen text-white">
@@ -25,10 +31,12 @@ const ManageProposals = ({ proposals }) => {
                         </div>
                         <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
                             <div className="flex items-center gap-4">
-                                <Avatar className="w-12 h-12 bg-slate-800 text-white rounded-lg shrink-0">
-                                    <Avatar.Image src={p?.freelancerInfo?.image} />
+                                <Avatar 
+                                    className="w-12 h-12 bg-slate-800 text-white rounded-lg shrink-0"
+                                >
+                                    <Avatar.Image referrerPolicy="no-referrer" src={p?.freelancerInfo?.image || "https://img.heroui.chat/image/avatar?w=400&h=400&u=3"} />
                                     <Avatar.Fallback className="rounded-lg">
-                                        {p?.freelancerInfo?.name?.charAt(0)?.toUpperCase()}
+                                        {p?.freelancerInfo?.name ? p.freelancerInfo.name.charAt(0).toUpperCase() : "U"}
                                     </Avatar.Fallback>
                                 </Avatar>
 
@@ -40,14 +48,13 @@ const ManageProposals = ({ proposals }) => {
                                     </div>
                                 </div>
                             </div>
-                            <div className="flex flex-row md:flex-row gap-2 w-full md:w-auto">
+                            <div className="flex flex-row gap-2 w-full md:w-auto">
                                 {p.status === 'pending' ? (
                                     <>
                                         <form action={'/api/payment'} method="POST" className="flex gap-2 w-full">
-
                                             <input type="hidden" name="task_id" value={p.taskId} />
-                                            <input type="hidden" name="freelancer_email" value={p.freelancerInfo.email} />
-                                            <input type="hidden" name="client_email" value={p.taskDetails.clientEmail} />
+                                            <input type="hidden" name="freelancer_email" value={p.freelancerInfo?.email} />
+                                            <input type="hidden" name="client_email" value={p.taskDetails?.clientEmail} />
                                             <input type="hidden" name="amount" value={p.proposedBudget} />
                                             <input type="hidden" name="proposal_id" value={p._id.toString()} />
                                             <Button

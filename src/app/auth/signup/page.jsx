@@ -14,9 +14,12 @@ import Link from "next/link";
 import { FcGoogle } from "react-icons/fc";
 import { Briefcase, Person } from "@gravity-ui/icons";
 import { authClient, signUp } from "@/lib/auth-client";
+import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 
 export default function Signup() {
     const [selectedRole, setSelectedRole] = useState('client');
+    const router = useRouter();
 
     const onSubmit = async (e) => {
         e.preventDefault();
@@ -26,6 +29,12 @@ export default function Signup() {
         const email = formData.get("email");
         const password = formData.get("password");
         const image = formData.get("image");
+        const bio = formData.get("bio");
+        const hourlyRate = formData.get("hourlyRate");
+        const skillsString = formData.get("skills");
+        const skills = skillsString 
+            ? skillsString.split(",").map(skill => skill.trim()).filter(Boolean) 
+            : [];
 
         const { data, error } = await signUp.email({
             name,
@@ -33,15 +42,18 @@ export default function Signup() {
             password,
             image: image || undefined, 
             role: selectedRole,
-            // bio: '',       
-            // skills: []     
+            ...(selectedRole === 'freelancer' && {
+                bio: bio || "",
+                skills: skills,
+                hourlyRate: hourlyRate ? Number(hourlyRate) : 0,
+            })
         });
 
-        console.log("Sign Up Response:", { data, error });
         if (error) {
             alert(`Error: ${error.message}`);
         } else {
-            alert("Account created successfully! Please check your email to verify your account.");
+            toast.success("Account created successfully! Please check your email to verify your account.");
+            router.push(`/dashboard/${data?.user?.role}`);
         }
     };
 
@@ -189,6 +201,47 @@ export default function Signup() {
                         </Description>
                     </div>
 
+                    {selectedRole === 'freelancer' && (
+                        <div className="flex flex-col gap-5 p-4 rounded-xl border border-slate-800 bg-slate-950/30 animate-in fade-in slide-in-from-top-2 duration-300">
+                            <h3 className="text-sm font-bold text-emerald-400 border-b border-slate-800 pb-2">
+                                Freelancer Profile Details
+                            </h3>
+                            
+                            <TextField name="bio" type="text">
+                                <Label className="text-xs font-semibold text-slate-300 mb-1 block">Professional Bio</Label>
+                                <Input
+                                    name="bio"
+                                    placeholder="Briefly describe your expertise (e.g., Full Stack MERN Developer)"
+                                    className="bg-slate-950/50 border border-slate-800 text-white rounded-lg focus-within:border-emerald-500 transition-all text-sm"
+                                />
+                            </TextField>
+
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <TextField name="skills" type="text">
+                                    <Label className="text-xs font-semibold text-slate-300 mb-1 block">Skills</Label>
+                                    <Input
+                                        name="skills"
+                                        placeholder="React, Node.js, Tailwind"
+                                        className="bg-slate-950/50 border border-slate-800 text-white rounded-lg focus-within:border-emerald-500 transition-all text-sm"
+                                    />
+                                    <Description className="text-[10px] text-slate-500 mt-1">
+                                        Separate with commas.
+                                    </Description>
+                                </TextField>
+
+                                <TextField name="hourlyRate" type="number">
+                                    <Label className="text-xs font-semibold text-slate-300 mb-1 block">Hourly Rate ($)</Label>
+                                    <Input
+                                        name="hourlyRate"
+                                        placeholder="25"
+                                        min="0"
+                                        className="bg-slate-950/50 border border-slate-800 text-white rounded-lg focus-within:border-emerald-500 transition-all text-sm"
+                                    />
+                                </TextField>
+                            </div>
+                        </div>
+                    )}
+
                     <Button
                         className="w-full bg-emerald-400 hover:bg-emerald-500 text-slate-950 font-bold h-11 rounded-xl transition-all flex items-center justify-center gap-2 mt-2 shadow-lg shadow-emerald-500/10 text-sm"
                         type="submit"
@@ -203,7 +256,7 @@ export default function Signup() {
                 <div className="text-center mt-6">
                     <p className="text-xs sm:text-sm text-slate-400">
                         Already have an account?{" "}
-                        <Link href="/login" className="text-emerald-400 font-semibold hover:underline transition-all">
+                        <Link href="/auth/signin" className="text-emerald-400 font-semibold hover:underline transition-all">
                             Log In
                         </Link>
                     </p>
