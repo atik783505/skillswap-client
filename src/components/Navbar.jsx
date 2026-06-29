@@ -126,6 +126,11 @@ export default function App() {
                 <div className="border-t border-slate-900 bg-slate-950 p-4 md:hidden flex flex-col gap-4">
                     {links.map((link) => <Link key={link.href} href={link.href} className="text-slate-400" onClick={() => setIsMenuOpen(false)}>{link.name}</Link>)}
                     {user && <div className="border-t border-slate-800 pt-4 flex items-center justify-between">{UserActions}</div>}
+
+                    <Link href="/auth/signin" className="text-sm text-slate-400">
+                        <Button className='bg-emerald-500'>
+                            Login
+                        </Button></Link>
                 </div>
             )}
         </nav>

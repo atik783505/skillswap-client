@@ -92,7 +92,7 @@ const MyTasks = ({ tasks = [], onDelete, onEdit }) => {
                                                         <DeleteAlert onDelete={onDelete} task={task}></DeleteAlert>
                                                     </>
                                                 ) : (
-                                                    <Link href={`/dashboard/client/manage-tasks/${task._id}`}>
+                                                    <Link href={`/dashboard/client/manage-task/${task._id}`}>
                                                         <Button
                                                             isIconOnly
                                                             size="sm"

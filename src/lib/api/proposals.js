@@ -22,3 +22,11 @@ export const getTaskProposals = async (id) => {
 export const getAllFreelancer = async () => {
     return serverFetch('/api/freelancerInfo' , false)
 }
+
+export const getFreelancer = async (id) => {
+    return serverFetch(`/api/freelancerInfo/${id}`, false)
+}
+
+export const getTopFreelancer = async () => {
+    return serverFetch('/api/top-freelancers' , false)
+}

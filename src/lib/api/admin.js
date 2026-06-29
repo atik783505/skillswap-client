@@ -8,3 +8,7 @@ export const getUsersInfo = async () => {
 export const getAdminStats = async () => {
     return serverFetch('/api/admin/stats')
 }
+
+export const getTransactions = async () => {
+    return serverFetch('/api/admin/transactions')
+}
