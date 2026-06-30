@@ -1,7 +1,7 @@
 import { savePaymentAction } from '@/lib/actions/proposals'
 import { stripe } from '@/lib/stripe'
 import { redirect } from 'next/navigation'
-import { SealCheck } from '@gravity-ui/icons' // অথবা তোমার পছন্দমতো আইকন লাইব্রেরি
+import { SealCheck } from '@gravity-ui/icons' 
 
 export default async function Success({ searchParams }) {
   const { session_id } = await searchParams
@@ -14,10 +14,11 @@ export default async function Success({ searchParams }) {
 
   if (session.status === 'complete') {
     const paymentData = {
+      task_title: session.metadata.task_title,
       client_email: session.metadata.client_email,
       freelancer_email: session.metadata.freelancer_email,
       task_id: session.metadata.task_id,
-      proposal_id:session.metadata.proposal_id,
+      proposal_id: session.metadata.proposal_id,
       amount: parseFloat(session.metadata.amount),
       transaction_id: session.id,
       payment_status: session.payment_status
@@ -33,21 +34,29 @@ export default async function Success({ searchParams }) {
             <SealCheck className="w-10 h-10 text-green-500" />
           </div>
 
-          {/* Heading */}
           <h1 className="text-3xl font-bold text-white mb-2">Payment Successful!</h1>
           <p className="text-slate-400 mb-8">
             Thank you for your payment. Your transaction has been completed successfully.
           </p>
 
-          {/* Payment Details Card */}
+          {/* Payment & Task Details Card */}
           <div className="bg-slate-950 rounded-lg p-4 mb-8 text-left border border-slate-800">
+            {/* Task Title (New Addition) */}
+            <div className="flex justify-between py-2 border-b border-slate-800 gap-4">
+              <span className="text-slate-500 shrink-0">Task</span>
+              <span className="text-white font-medium truncate text-right">{session.metadata.task_title || 'N/A'}</span>
+            </div>
+            
+            {/* Amount */}
             <div className="flex justify-between py-2 border-b border-slate-800">
               <span className="text-slate-500">Amount</span>
               <span className="text-white font-medium">${session.metadata.amount}</span>
             </div>
+
+            {/* Receipt Email */}
             <div className="flex justify-between py-2">
               <span className="text-slate-500">Receipt Email</span>
-              <span className="text-white font-medium truncate ml-2">{session.customer_details.email}</span>
+              <span className="text-white font-medium truncate ml-2">{session.customer_details?.email}</span>
             </div>
           </div>
 

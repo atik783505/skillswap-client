@@ -8,7 +8,6 @@ import toast from "react-hot-toast";
 export function DeleteAlert({ onDelete, task }) {
   const [isDeleting, setIsDeleting] = useState(false);
 
-  // 🌟 মডালের ভেতরের আসল ডিলিট লজিক
   const handleActionDelete = async (e) => {
     if (!onDelete) return;
 
@@ -34,7 +33,6 @@ export function DeleteAlert({ onDelete, task }) {
 
   return (
     <AlertDialog>
-      {/* 🌟 তোমার প্রথম বাটন (ট্রিগার): আইকন ও ডিজাইন UI এর সাথে ম্যাচ করা */}
       <Button
         isIconOnly
         size="sm"
@@ -47,7 +45,6 @@ export function DeleteAlert({ onDelete, task }) {
       
       <AlertDialog.Backdrop>
         <AlertDialog.Container>
-          {/* 🌟 ডিজাইন তোমার ডার্ক থিমের সাথে মেলানো */}
           <AlertDialog.Dialog className="sm:max-w-[400px] bg-slate-900 text-slate-100 border border-slate-800 backdrop-blur-md">
             <AlertDialog.CloseTrigger className="text-slate-400 hover:text-slate-200" />
             
@@ -64,12 +61,11 @@ export function DeleteAlert({ onDelete, task }) {
             </AlertDialog.Body>
             
             <AlertDialog.Footer>
-              {/* Cancel বাটন */}
+
               <Button slot="close" variant="tertiary" className="bg-slate-800 text-slate-300 hover:bg-slate-700" isDisabled={isDeleting}>
                 Cancel
               </Button>
-              
-              {/* 🌟 ডিলিট বাটন: তোমার দেওয়া slot="close" ঠিক রাখা হয়েছে */}
+   
               <Button 
                 slot="close" 
                 variant="danger" 

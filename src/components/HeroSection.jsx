@@ -1,4 +1,4 @@
-"use client"; // ফ্রেমার মোশন ব্যবহারের জন্য ক্লায়েন্ট কম্পোনেন্ট করা হলো
+"use client"; 
 
 import { Button, Link } from "@heroui/react";
 import { ShieldCheck } from "@gravity-ui/icons";

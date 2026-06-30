@@ -13,7 +13,7 @@ export async function POST(request) {
     const task_id = formData.get('task_id');
     const amount = formData.get('amount');
     const proposal_id = formData.get('proposal_id')
-    console.log("Proposal ID received from form:", proposal_id); // এটি চেক করুন
+    const task_title = formData.get('task_title')
 
     if (!proposal_id) {
       console.error("Critical Error: proposal_id is missing from FormData!");
@@ -34,7 +34,8 @@ export async function POST(request) {
         freelancer_email,
         task_id,
         amount: String(amount),
-        proposal_id
+        proposal_id,
+        task_title
       },
       mode: "payment",
       success_url: `${origin}/success?session_id={CHECKOUT_SESSION_ID}`,

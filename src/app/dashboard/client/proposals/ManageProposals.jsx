@@ -53,6 +53,7 @@ const ManageProposals = ({ proposals }) => {
                                     <>
                                         <form action={'/api/payment'} method="POST" className="flex gap-2 w-full">
                                             <input type="hidden" name="task_id" value={p.taskId} />
+                                            <input type="hidden" name="task_title" value={p.taskDetails?.title} />
                                             <input type="hidden" name="freelancer_email" value={p.freelancerInfo?.email} />
                                             <input type="hidden" name="client_email" value={p.taskDetails?.clientEmail} />
                                             <input type="hidden" name="amount" value={p.proposedBudget} />

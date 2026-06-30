@@ -151,6 +151,7 @@ const TaskDetails = async ({ params }) => {
                                     <div className="flex gap-2 mt-2">
                                         <form action={'/api/payment'} method="POST" className="flex gap-2 w-full">
                                             <input type="hidden" name="task_id" value={id} />
+                                            <input type="hidden" name="task_title" value={task.title} />
                                             <input type="hidden" name="client_email" value={task.clientEmail} />
                                             <input type="hidden" name="freelancer_email" value={proposal.freelancerEmail} />
                                             <input type="hidden" name="amount" value={proposal.proposedBudget} />
