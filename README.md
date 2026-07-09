@@ -10,8 +10,8 @@
 
 📂 **GitHub Repository:** https://github.com/atik783505/skillswap
 
-<img width="1329" height="607" alt="skillswap" src="https://github.com/user-attachments/assets/e3935d56-04f7-4cc3-bef0-5d08d11450a0" />
----
+<img width="900" height="450" alt="skillswap" src="https://github.com/user-attachments/assets/e3935d56-04f7-4cc3-bef0-5d08d11450a0" />
+
 
 ## 📖 Project Overview
 
