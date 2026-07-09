@@ -40,7 +40,6 @@ const TaskCard = ({ task }) => {
 
                 <div className="mt-6 pt-4 border-t border-gray-800/60 space-y-3.5">
                     <div className="flex flex-col gap-2 text-xs text-slate-400">
-                        {/* ক্লায়েন্ট নেম */}
                         <div className="flex items-center gap-2">
                             <Person className="w-3.5 h-3.5 text-slate-500" />
                             <span className="truncate">
