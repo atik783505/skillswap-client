@@ -1,89 +1,195 @@
 "use client";
 import React, { useEffect, useState } from 'react';
-import { Card, Button } from '@heroui/react';
 import { useSession } from '@/lib/auth-client';
 import Link from 'next/link';
-
-import {
-    LayoutCellsLarge,
-    SquareListUl,
-    ArrowRight,
-    Bucket,
-    Plus
-} from '@gravity-ui/icons';
+import { LayoutCellsLarge, SquareListUl, ArrowRight, Bucket, Plus } from '@gravity-ui/icons';
 import TaskStatusChart from './OverviewRecharts/ClientPieCharts';
 import BudgetOverviewChart from './OverviewRecharts/ClientBarCharts';
+import { motion } from 'framer-motion';
+
+function StatCard({ stat, index }) {
+  const Icon = stat.icon;
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, delay: index * 0.08 }}
+      className="rounded-2xl p-5 flex flex-col justify-between min-h-[130px] relative overflow-hidden"
+      style={{
+        background: "var(--bg-card)",
+        border: "1px solid var(--border-color)",
+        boxShadow: "var(--shadow-sm)",
+        borderLeft: `4px solid ${stat.accentHex}`,
+      }}
+    >
+      <div className="flex items-center justify-between">
+        <div
+          className="p-2.5 rounded-xl"
+          style={{ background: stat.accentBg, border: `1px solid ${stat.accentBorder}` }}
+        >
+          <Icon className="w-5 h-5" style={{ color: stat.accentHex }} />
+        </div>
+        {stat.trend && (
+          <span
+            className="text-[11px] font-bold px-2 py-0.5 rounded-full"
+            style={{ background: stat.accentBg, color: stat.accentHex }}
+          >
+            {stat.trend}
+          </span>
+        )}
+      </div>
+      <div className="mt-4">
+        <p
+          className="text-[10px] font-bold uppercase tracking-widest mb-1"
+          style={{ color: "var(--text-muted)" }}
+        >
+          {stat.title}
+        </p>
+        <h3
+          className="text-3xl font-extrabold tracking-tight"
+          style={{ color: "var(--text-heading)" }}
+        >
+          {stat.value}
+        </h3>
+      </div>
+    </motion.div>
+  );
+}
 
 const ClientOverview = ({ tasks = [] }) => {
-    const { data } = useSession();
-    const user = data?.user;
-    const [isMounted, setIsMounted] = useState(false);
+  const { data } = useSession();
+  const user = data?.user;
+  const [isMounted, setIsMounted] = useState(false);
 
-    useEffect(() => {
-        setIsMounted(true);
-    }, []);
+  // eslint-disable-next-line react-hooks/set-state-in-effect
+  useEffect(() => { setIsMounted(true); }, []);
 
-    const stats = {
-        totalTasks: tasks.length,
-        openTasks: tasks.filter(t => t.status === 'open').length,
-        inProgressTasks: tasks.filter(t => t.status === 'in progress').length,
-        totalSpent: tasks
-            .filter(t => t.status === 'in progress')
-            .reduce((sum, t) => sum + (Number(t.budget) || 0), 0)
-    };
+  const stats = {
+    totalTasks: tasks.length,
+    openTasks: tasks.filter(t => t.status === 'open').length,
+    inProgressTasks: tasks.filter(t => t.status === 'in progress').length,
+    totalSpent: tasks
+      .filter(t => t.status === 'in progress')
+      .reduce((sum, t) => sum + (Number(t.budget) || 0), 0),
+  };
 
-    const dashboardStats = [
-        { title: "TOTAL TASKS", value: stats.totalTasks, icon: LayoutCellsLarge, color: "text-emerald-400", border: "border-l-emerald-500", trend: "+12%", bg: "bg-emerald-500/10" },
-        { title: "OPEN TASKS", value: stats.openTasks, icon: SquareListUl, color: "text-purple-400", border: "border-l-purple-500", trend: "Pending", bg: "bg-purple-500/10" },
-        { title: "IN PROGRESS", value: stats.inProgressTasks, icon: ArrowRight, color: "text-sky-400", border: "border-l-sky-500", trend: "Active", bg: "bg-sky-500/10" },
-        { title: "TOTAL SPENT", value: `$${stats.totalSpent.toLocaleString('en-US', { minimumFractionDigits: 2 })}`, icon: Bucket, color: "text-indigo-400", border: "border-l-indigo-500", trend: "Paid", bg: "bg-indigo-500/10" },
-    ];
+  const dashboardStats = [
+    {
+      title: "Total Tasks",
+      value: stats.totalTasks,
+      icon: LayoutCellsLarge,
+      accentHex: "#10b981",
+      accentBg: "rgba(16,185,129,0.08)",
+      accentBorder: "rgba(16,185,129,0.2)",
+      trend: `+${stats.totalTasks}`,
+    },
+    {
+      title: "Open Tasks",
+      value: stats.openTasks,
+      icon: SquareListUl,
+      accentHex: "#8b5cf6",
+      accentBg: "rgba(139,92,246,0.08)",
+      accentBorder: "rgba(139,92,246,0.2)",
+      trend: "Pending",
+    },
+    {
+      title: "In Progress",
+      value: stats.inProgressTasks,
+      icon: ArrowRight,
+      accentHex: "#38bdf8",
+      accentBg: "rgba(56,189,248,0.08)",
+      accentBorder: "rgba(56,189,248,0.2)",
+      trend: "Active",
+    },
+    {
+      title: "Total Spent",
+      value: `$${stats.totalSpent.toLocaleString('en-US', { minimumFractionDigits: 2 })}`,
+      icon: Bucket,
+      accentHex: "#6366f1",
+      accentBg: "rgba(99,102,241,0.08)",
+      accentBorder: "rgba(99,102,241,0.2)",
+      trend: "USD",
+    },
+  ];
 
-    if (!isMounted) return null;
+  if (!isMounted) return null;
 
-    return (
-        <div className="w-full p-4 md:p-8 bg-slate-950 min-h-screen text-slate-100">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
-                <div>
-                    <h1 className="text-3xl font-bold tracking-tight text-slate-100">Client Dashboard</h1>
-                    <p className="text-sm text-slate-400 mt-1">
-                        Welcome back, <span className="font-semibold text-slate-200">{user?.name || "Alex"}</span>. Here's what's happening with your projects.
-                    </p>
-                </div>
-                <Link href="/dashboard/client/manage-task/new">
-                    <Button
-                        className="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-semibold rounded-xl px-4 py-2.5 shadow-lg shadow-emerald-500/10 flex items-center gap-1.5 transition-all self-start sm:self-auto"
-                    >
-                        <Plus className="size-4 stroke-[3]" />
-                        <span>Create New Task</span>
-                    </Button>
-                </Link>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-                {dashboardStats.map((stat, index) => (
-                    <Card
-                        key={index}
-                        className={`border-l-4 ${stat.border} border-t border-r border-b bg-slate-900/40 backdrop-blur-md p-5 rounded-2xl flex flex-col justify-between`}
-                    >
-                        <div className="flex items-center justify-between">
-                            <div className={`p-2.5 rounded-xl bg-slate-950/80 border border-slate-800 ${stat.color}`}>
-                                <stat.icon className="size-5" />
-                            </div>
-                        </div>
-                        <div className="mt-6">
-                            <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500">{stat.title}</p>
-                            <h3 className="text-3xl font-bold text-slate-100 mt-1 tracking-tight">{stat.value}</h3>
-                        </div>
-                    </Card>
-                ))}
-            </div>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 py-8">
-                <TaskStatusChart stats={stats} />
-                <BudgetOverviewChart tasks={tasks} />
-            </div>
+  return (
+    <div className="w-full space-y-8">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight" style={{ color: "var(--text-heading)" }}>
+            Client Dashboard
+          </h1>
+          <p className="text-sm mt-1" style={{ color: "var(--text-secondary)" }}>
+            Welcome back,{" "}
+            <span className="font-semibold" style={{ color: "var(--text-primary)" }}>
+              {user?.name || "there"}
+            </span>
+            . Here&apos;s your project overview.
+          </p>
         </div>
-    );
+        <Link href="/dashboard/client/manage-task/new">
+          <button
+            className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold transition-all shadow-md"
+            style={{
+              background: "#10b981",
+              color: "white",
+              boxShadow: "0 4px 14px rgba(16,185,129,0.25)",
+            }}
+          >
+            <Plus className="w-4 h-4" />
+            New Task
+          </button>
+        </Link>
+      </div>
+
+      {/* Stat cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {dashboardStats.map((stat, i) => (
+          <StatCard key={i} stat={stat} index={i} />
+        ))}
+      </div>
+
+      {/* Charts */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+        <TaskStatusChart stats={stats} />
+        <BudgetOverviewChart tasks={tasks} />
+      </div>
+
+      {/* Quick links */}
+      <div
+        className="rounded-2xl p-5"
+        style={{ background: "var(--bg-card)", border: "1px solid var(--border-color)" }}
+      >
+        <h2 className="text-sm font-bold mb-4 uppercase tracking-wider" style={{ color: "var(--text-muted)" }}>
+          Quick Actions
+        </h2>
+        <div className="flex flex-wrap gap-3">
+          {[
+            { label: "Post a Task", href: "/dashboard/client/manage-task/new", accent: "#10b981" },
+            { label: "My Tasks", href: "/dashboard/client/manage-task", accent: "#8b5cf6" },
+            { label: "Proposals", href: "/dashboard/client/proposals", accent: "#38bdf8" },
+            { label: "Browse Freelancers", href: "/freelancers", accent: "#6366f1" },
+          ].map(({ label, href, accent }) => (
+            <Link key={href} href={href}>
+              <button
+                className="px-4 py-2 rounded-xl text-xs font-semibold transition-all"
+                style={{
+                  background: `${accent}15`,
+                  border: `1px solid ${accent}30`,
+                  color: accent,
+                }}
+              >
+                {label}
+              </button>
+            </Link>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
 };
 
 export default ClientOverview;

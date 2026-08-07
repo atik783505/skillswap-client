@@ -1,76 +1,106 @@
 'use client';
 import React from 'react';
-import { Card, Button } from '@heroui/react';
 import Link from 'next/link';
 import { Eye } from '@gravity-ui/icons';
 
+const statusConfig = {
+    accepted: { bg: "rgba(16,185,129,0.08)",  border: "rgba(16,185,129,0.25)",  color: "#10b981" },
+    pending:  { bg: "rgba(99,102,241,0.08)",   border: "rgba(99,102,241,0.25)",  color: "#6366f1" },
+    rejected: { bg: "rgba(244,63,94,0.08)",    border: "rgba(244,63,94,0.25)",   color: "#f43f5e" },
+};
+
 const MyProposals = ({ proposals = [] }) => {
-
-    const getStatusClass = (status) => {
-        const statusClasses = {
-            'accepted': 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20',
-            'pending': 'bg-indigo-500/10 text-indigo-400 border border-indigo-500/20',
-            'rejected': 'bg-rose-500/10 text-rose-400 border border-rose-500/20'
-        };
-        return statusClasses[status?.toLowerCase()] || 'bg-slate-800 text-slate-400 border border-slate-700';
-    };
-
     return (
-        <div className="w-full bg-slate-950 p-4 md:p-8 min-h-screen">
-            <Card className="w-full max-w-5xl mx-auto rounded-2xl border border-slate-900 bg-slate-900/40 backdrop-blur-md p-6 shadow-2xl">
+        <div className="w-full space-y-5">
+            {/* Header */}
+            <div className="flex items-center gap-2.5">
+                <div className="w-1 h-6 rounded-full bg-purple-500" />
+                <h2 className="text-xl font-bold tracking-tight" style={{ color: "var(--text-heading)" }}>
+                    My Proposals
+                </h2>
+            </div>
 
-                <div className="flex items-center gap-2 pb-6 border-b border-slate-900 mb-4">
-                    <div className="w-2 h-6 bg-emerald-500 rounded-full" />
-                    <h2 className="text-xl font-bold text-slate-100 tracking-tight">My Proposals</h2>
-                </div>
-
-                <div className="w-full overflow-x-auto">
-                    <table className="w-full border-collapse text-left text-sm">
-                        <thead>
-                            <tr className="text-slate-500 text-xs font-bold uppercase tracking-wider">
-                                <th className="py-4 px-4">Title</th>
-                                <th className="py-4 px-4">Bid ($)</th>
-                                <th className="py-4 px-4">Date</th>
-                                <th className="py-4 px-4">Status</th>
-                                <th className="py-4 px-4 text-right">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-slate-900/50">
-                            {proposals.map((item) => (
-                                <tr key={item._id} className="hover:bg-slate-900/20 transition-all duration-150">
-                                    <td className="py-5 px-4 font-semibold text-slate-200">
-                                        {item.taskDetails?.title || 'Untitled Task'}
-                                    </td>
-                                    <td className="py-5 px-4 font-bold text-slate-300">
-                                        ${Number(item.proposedBudget).toLocaleString()}
-                                    </td>
-                                    <td className="py-5 px-4 text-slate-400">
-                                        {new Date(item.createdAt).toLocaleDateString()}
-                                    </td>
-                                    <td className="py-5 px-4">
-                                        <span className={`inline-flex items-center px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${getStatusClass(item.status)}`}>
-                                            {item.status}
-                                        </span>
-                                    </td>
-                                    {/* এই সেই ডানদিকের বাটন */}
-                                    <td className="py-5 px-4 text-right">
-                                        <Link href={`/dashboard/freelancer/my-proposals/${item._id}`}>
-                                            <Button 
-                                                isIconOnly 
-                                                size="sm" 
-                                                variant="light" 
-                                                className="text-slate-500 hover:text-emerald-400 hover:bg-emerald-500/10 transition-all"
-                                            >
-                                                <Eye className="w-4 h-4" />
-                                            </Button>
-                                        </Link>
-                                    </td>
+            {/* Table */}
+            <div
+                className="rounded-2xl overflow-hidden"
+                style={{ background: "var(--bg-card)", border: "1px solid var(--border-color)", boxShadow: "var(--shadow-sm)" }}
+            >
+                {proposals.length === 0 ? (
+                    <div
+                        className="p-12 text-center text-sm"
+                        style={{ color: "var(--text-muted)" }}
+                    >
+                        You haven&apos;t submitted any proposals yet.{" "}
+                        <Link href="/all-tasks" className="text-emerald-500 font-semibold hover:underline">
+                            Browse tasks →
+                        </Link>
+                    </div>
+                ) : (
+                    <div className="overflow-x-auto">
+                        <table className="w-full border-collapse text-left text-sm min-w-[560px]">
+                            <thead>
+                                <tr
+                                    className="text-xs font-bold uppercase tracking-wider"
+                                    style={{
+                                        background: "var(--bg-secondary)",
+                                        borderBottom: "1px solid var(--border-color)",
+                                        color: "var(--text-muted)",
+                                    }}
+                                >
+                                    <th className="px-5 py-3.5">Task Title</th>
+                                    <th className="px-5 py-3.5">Your Bid</th>
+                                    <th className="px-5 py-3.5">Date</th>
+                                    <th className="px-5 py-3.5">Status</th>
+                                    <th className="px-5 py-3.5 text-right">View</th>
                                 </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
-            </Card>
+                            </thead>
+                            <tbody>
+                                {proposals.map((item) => {
+                                    const sc = statusConfig[item.status?.toLowerCase()] || statusConfig.pending;
+                                    return (
+                                        <tr
+                                            key={item._id}
+                                            className="group transition-colors"
+                                            style={{ borderBottom: "1px solid var(--border-color)" }}
+                                            onMouseEnter={e => e.currentTarget.style.background = "var(--bg-secondary)"}
+                                            onMouseLeave={e => e.currentTarget.style.background = "transparent"}
+                                        >
+                                            <td className="px-5 py-4 font-semibold max-w-[220px] truncate transition-colors group-hover:text-purple-500" style={{ color: "var(--text-heading)" }}>
+                                                {item.taskDetails?.title || 'Untitled Task'}
+                                            </td>
+                                            <td className="px-5 py-4 font-bold text-emerald-500 whitespace-nowrap">
+                                                ${Number(item.proposedBudget).toLocaleString()}
+                                            </td>
+                                            <td className="px-5 py-4 text-sm whitespace-nowrap" style={{ color: "var(--text-muted)" }}>
+                                                {new Date(item.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                                            </td>
+                                            <td className="px-5 py-4">
+                                                <span
+                                                    className="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider whitespace-nowrap"
+                                                    style={{ background: sc.bg, border: `1px solid ${sc.border}`, color: sc.color }}
+                                                >
+                                                    {item.status}
+                                                </span>
+                                            </td>
+                                            <td className="px-5 py-4 text-right">
+                                                <Link href={`/dashboard/freelancer/my-proposals/${item._id}`}>
+                                                    <button
+                                                        className="p-1.5 rounded-lg transition-colors hover:text-emerald-500"
+                                                        style={{ color: "var(--text-muted)" }}
+                                                        title="View Proposal"
+                                                    >
+                                                        <Eye className="w-4 h-4" />
+                                                    </button>
+                                                </Link>
+                                            </td>
+                                        </tr>
+                                    );
+                                })}
+                            </tbody>
+                        </table>
+                    </div>
+                )}
+            </div>
         </div>
     );
 };

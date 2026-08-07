@@ -16,8 +16,21 @@ const geistMono = Geist_Mono({
 
 export const metadata = {
   title: "SkillSwap",
-  description: "SkillSwap is a modern freelance marketplace and skill-sharing platform where clients can post tasks and expert freelancers can submit proposals to collaborate and trade skills seamlessly.",
+  description:
+    "SkillSwap is a modern freelance marketplace and skill-sharing platform where clients can post tasks and expert freelancers can submit proposals to collaborate and trade skills seamlessly.",
 };
+
+// Inline script to apply saved theme before first paint — prevents FOUC
+const themeScript = `
+(function() {
+  try {
+    var t = localStorage.getItem('theme') || 'dark';
+    document.documentElement.setAttribute('data-theme', t);
+  } catch(e) {
+    document.documentElement.setAttribute('data-theme', 'dark');
+  }
+})();
+`;
 
 export default function RootLayout({ children }) {
   return (
@@ -26,11 +39,25 @@ export default function RootLayout({ children }) {
       data-theme="dark"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">
-       <AppNavbar></AppNavbar>
-        <main>{children}</main>
-        <Toaster></Toaster>
-        <Footer></Footer>
+      <head>
+        {/* Inline theme script runs synchronously before any render */}
+        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+      </head>
+      <body className="min-h-full flex flex-col" style={{ background: "var(--bg-primary)", color: "var(--text-primary)" }}>
+        <AppNavbar />
+        <main className="flex-1">{children}</main>
+        <Toaster
+          toastOptions={{
+            style: {
+              background: "var(--bg-card)",
+              color: "var(--text-primary)",
+              border: "1px solid var(--border-color)",
+              borderRadius: "12px",
+              fontSize: "13px",
+            },
+          }}
+        />
+        <Footer />
       </body>
     </html>
   );

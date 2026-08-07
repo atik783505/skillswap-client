@@ -1,156 +1,193 @@
 "use client";
-import {
-    Button,
-    Card,
-    FieldError,
-    Form,
-    Input,
-    Label,
-    TextField
-} from "@heroui/react";
 import Link from "next/link";
 import { FcGoogle } from "react-icons/fc";
-import { authClient, signOut} from "@/lib/auth-client";
+import { authClient, signOut } from "@/lib/auth-client";
 import toast from "react-hot-toast";
+import { motion } from "framer-motion";
 
-export default function Signin({ role }) {
+const SkillSwapLogo = () => (
+  <svg className="h-6 w-6 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+    <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+  </svg>
+);
 
-    const onSubmit = async (e) => {
-        e.preventDefault();
-        const formData = new FormData(e.currentTarget);
-        const { email, password } = Object.fromEntries(formData.entries());
-
-        const { data, error } = await authClient.signIn.email({
-            email,
-            password,
-        });
-
-        if (error) {
-            alert(`Error: ${error.message}`);
-        } else if (data) {
-            if (data.user?.isBlocked) {
-                await signOut();
-                toast.error("Your account has been blocked by the admin. Please contact support.");
-                return; 
-            }
-
-            toast.success("Logged in successfully!");
-            const userRole = data.user?.role;
-            window.location.href = userRole === 'client' ? '/' : `/dashboard/${userRole}`;
-        }
-    };
-
-
-
-   const handleGoogleSignIn = async () => {
-    try {
-        const { data, error } = await authClient.signIn.social({
-            provider: "google",
-            callbackURL: "/", 
-        });
-
-        if (error) {
-            console.error("Google sign in failed:", error);
-            return;
-        }
-        if (data?.user?.isBlocked) {
-            await signOut();
-            toast.error("Your account has been blocked by the admin.");
-            window.location.href = "/auth/signin";
-            return;
-        }   
-    } catch (error) {
-        console.error("Google sign in failed:", error);
-    }
-};
-
-    return (
-        <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4">
-            <Card className="w-full max-w-md bg-slate-900 border border-slate-800 p-8 rounded-2xl text-white shadow-2xl">
-
-                <div className="text-center mb-6">
-                    <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-white mb-2">
-                        Welcome Back
-                    </h2>
-                    <p className="text-xs sm:text-sm text-slate-400">
-                        Sign in to continue to your SkillSwap account.
-                    </p>
-                </div>
-                <Button
-                    variant="flat"
-                    className="w-full bg-slate-800/80 hover:bg-slate-800 text-slate-200 border border-slate-700 font-medium py-2.5 rounded-lg transition-all flex items-center justify-center gap-2 text-sm"
-                    onClick={handleGoogleSignIn}
-                >
-                    <FcGoogle className="text-lg shrink-0" />
-                    <span>Sign in with Google</span>
-                </Button>
-                <div className="flex items-center my-6 w-full">
-                    <hr className="flex-1 border-slate-800" />
-                    <span className="px-3 text-[10px] font-semibold uppercase text-slate-500 tracking-wider shrink-0">
-                        or sign in with email
-                    </span>
-                    <hr className="flex-1 border-slate-800" />
-                </div>
-                <Form className="flex flex-col gap-5" onSubmit={onSubmit}>
-
-                    <TextField
-                        isRequired
-                        name="email"
-                        type="email"
-                        validate={(value) => {
-                            if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(value)) {
-                                return "Please enter a valid email address";
-                            }
-                            return null;
-                        }}
-                    >
-                        <Label className="text-xs font-semibold text-slate-300 mb-1 block">Email Address</Label>
-                        <Input
-                            placeholder="alex@skillswap.com"
-                            className="bg-slate-950/50 border border-slate-800 text-white rounded-lg focus-within:border-emerald-500 transition-all text-sm"
-                        />
-                        <FieldError className="text-xs text-rose-500 mt-1" />
-                    </TextField>
-
-
-                    <TextField
-                        isRequired
-                        name="password"
-                        type="password"
-                    >
-                        <div className="flex justify-between items-center mb-1">
-                            <Label className="text-xs font-semibold text-slate-300 block">Password</Label>
-                            {/* পাসওয়ার্ড ভুলে গেলে রিকভারি লিংক (ঐচ্ছিক) */}
-                            <Link href="/forgot-password" className="text-[11px] text-emerald-400 hover:underline">
-                                Forgot password?
-                            </Link>
-                        </div>
-                        <Input
-                            placeholder="••••••••"
-                            className="bg-slate-950/50 border border-slate-800 text-white rounded-lg focus-within:border-emerald-500 transition-all text-sm"
-                        />
-                        <FieldError className="text-xs text-rose-500 mt-1" />
-                    </TextField>
-                    <Button
-                        className="w-full bg-emerald-400 hover:bg-emerald-500 text-slate-950 font-bold h-11 rounded-xl transition-all flex items-center justify-center gap-2 mt-2 shadow-lg shadow-emerald-500/10 text-sm"
-                        type="submit"
-                    >
-                        <span>Log In</span>
-                        <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                        </svg>
-                    </Button>
-                </Form>
-
-                <div className="text-center mt-6">
-                    <p className="text-xs sm:text-sm text-slate-400">
-                        Don&apos;t have an account?{" "}
-                        <Link href="/auth/signup" className="text-emerald-400 font-semibold hover:underline transition-all">
-                            Sign Up
-                        </Link>
-                    </p>
-                </div>
-            </Card>
+function InputField({ label, name, type = "text", placeholder, validate, required, extra }) {
+  return (
+    <div className="flex flex-col gap-1.5">
+      {label && (
+        <div className="flex items-center justify-between">
+          <label className="text-xs font-semibold uppercase tracking-wider" style={{ color: "var(--text-secondary)" }}>
+            {label}
+          </label>
+          {extra}
         </div>
-    );
+      )}
+      <input
+        type={type}
+        name={name}
+        required={required}
+        placeholder={placeholder}
+        className="w-full px-4 py-2.5 rounded-xl text-sm outline-none transition-all"
+        style={{
+          background: "var(--bg-input)",
+          border: "1px solid var(--border-color)",
+          color: "var(--text-primary)",
+        }}
+        onFocus={e => e.currentTarget.style.borderColor = "#10b981"}
+        onBlur={e => e.currentTarget.style.borderColor = "var(--border-color)"}
+      />
+    </div>
+  );
+}
+
+export default function Signin() {
+  const onSubmit = async (e) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    const { email, password } = Object.fromEntries(formData.entries());
+
+    const { data, error } = await authClient.signIn.email({ email, password });
+
+    if (error) {
+      toast.error(error.message || "Sign in failed");
+    } else if (data) {
+      if (data.user?.isBlocked) {
+        await signOut();
+        toast.error("Your account has been blocked. Please contact support.");
+        return;
+      }
+      toast.success("Welcome back!");
+      const userRole = data.user?.role;
+      window.location.href = userRole === 'client' ? '/' : `/dashboard/${userRole}`;
+    }
+  };
+
+  const handleGoogleSignIn = async () => {
+    try {
+      const { data, error } = await authClient.signIn.social({ provider: "google", callbackURL: "/" });
+      if (error) { toast.error("Google sign-in failed."); return; }
+      if (data?.user?.isBlocked) {
+        await signOut();
+        toast.error("Your account has been blocked.");
+        window.location.href = "/auth/signin";
+      }
+    } catch {
+      toast.error("Google sign-in failed.");
+    }
+  };
+
+  return (
+    <div
+      className="min-h-screen flex items-center justify-center px-4 py-12"
+      style={{ background: "var(--bg-primary)" }}
+    >
+      {/* Background glow */}
+      <div
+        className="fixed inset-0 pointer-events-none"
+        style={{ background: "radial-gradient(ellipse 60% 40% at 50% 30%, rgba(16,185,129,0.05) 0%, transparent 100%)" }}
+      />
+
+      <motion.div
+        initial={{ opacity: 0, y: 24 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="relative z-10 w-full max-w-md"
+      >
+        {/* Card */}
+        <div
+          className="rounded-3xl p-8 sm:p-10"
+          style={{
+            background: "var(--bg-card)",
+            border: "1px solid var(--border-color)",
+            boxShadow: "var(--shadow-lg)",
+          }}
+        >
+          {/* Logo */}
+          <div className="flex flex-col items-center gap-2 mb-8">
+            <div
+              className="p-3 rounded-2xl mb-1"
+              style={{ background: "rgba(16,185,129,0.1)", border: "1px solid rgba(16,185,129,0.2)" }}
+            >
+              <SkillSwapLogo />
+            </div>
+            <h1 className="text-2xl font-extrabold tracking-tight" style={{ color: "var(--text-heading)" }}>
+              Welcome Back
+            </h1>
+            <p className="text-sm text-center" style={{ color: "var(--text-secondary)" }}>
+              Sign in to continue to your SkillSwap account
+            </p>
+          </div>
+
+          {/* Google */}
+          <button
+            type="button"
+            onClick={handleGoogleSignIn}
+            className="w-full flex items-center justify-center gap-3 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all mb-5"
+            style={{
+              background: "var(--bg-secondary)",
+              border: "1px solid var(--border-color)",
+              color: "var(--text-primary)",
+            }}
+            onMouseEnter={e => e.currentTarget.style.borderColor = "#10b981"}
+            onMouseLeave={e => e.currentTarget.style.borderColor = "var(--border-color)"}
+          >
+            <FcGoogle className="text-lg shrink-0" />
+            Continue with Google
+          </button>
+
+          {/* Divider */}
+          <div className="flex items-center gap-3 mb-5">
+            <div className="flex-1 h-px" style={{ background: "var(--border-color)" }} />
+            <span className="text-[11px] font-semibold uppercase tracking-widest" style={{ color: "var(--text-muted)" }}>
+              or email
+            </span>
+            <div className="flex-1 h-px" style={{ background: "var(--border-color)" }} />
+          </div>
+
+          {/* Form */}
+          <form onSubmit={onSubmit} className="flex flex-col gap-4">
+            <InputField
+              label="Email Address"
+              name="email"
+              type="email"
+              placeholder="you@example.com"
+              required
+            />
+            <InputField
+              label="Password"
+              name="password"
+              type="password"
+              placeholder="••••••••"
+              required
+              extra={
+                <Link href="/forgot-password" className="text-[11px] text-emerald-500 hover:underline">
+                  Forgot password?
+                </Link>
+              }
+            />
+
+            <button
+              type="submit"
+              className="w-full h-11 mt-2 rounded-xl text-sm font-bold text-white transition-all"
+              style={{
+                background: "linear-gradient(135deg, #10b981, #059669)",
+                boxShadow: "0 4px 14px rgba(16,185,129,0.3)",
+              }}
+              onMouseEnter={e => e.currentTarget.style.boxShadow = "0 6px 20px rgba(16,185,129,0.45)"}
+              onMouseLeave={e => e.currentTarget.style.boxShadow = "0 4px 14px rgba(16,185,129,0.3)"}
+            >
+              Sign In →
+            </button>
+          </form>
+
+          <p className="text-center text-sm mt-6" style={{ color: "var(--text-muted)" }}>
+            Don&apos;t have an account?{" "}
+            <Link href="/auth/signup" className="text-emerald-500 font-semibold hover:underline">
+              Sign Up Free
+            </Link>
+          </p>
+        </div>
+      </motion.div>
+    </div>
+  );
 }

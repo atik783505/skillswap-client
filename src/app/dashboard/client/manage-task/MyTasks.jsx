@@ -1,120 +1,154 @@
 'use client';
 import React from 'react';
-import { Card, Button } from '@heroui/react';
 import Link from 'next/link';
-import { PencilToLine, TrashBin, Eye, Calendar } from '@gravity-ui/icons';
-import toast from 'react-hot-toast';
+import { Eye, Calendar } from '@gravity-ui/icons';
 import { DeleteAlert } from '@/components/Dashboard/DeleteAlert';
 import { TaskUpdateModal } from '@/components/Dashboard/TaskUpdateModal';
 
-const MyTasks = ({ tasks = [], onDelete, onEdit }) => {
+const statusConfig = {
+    'open':        { bg: "rgba(16,185,129,0.08)",  border: "rgba(16,185,129,0.25)",  color: "#10b981" },
+    'in progress': { bg: "rgba(56,189,248,0.08)",  border: "rgba(56,189,248,0.25)",  color: "#38bdf8" },
+    'completed':   { bg: "rgba(139,92,246,0.08)", border: "rgba(139,92,246,0.25)", color: "#8b5cf6" },
+};
 
+const MyTasks = ({ tasks = [], onDelete, onEdit }) => {
     const sortedTasks = [...tasks].sort((a, b) => {
         if (a.status === 'open' && b.status !== 'open') return -1;
         if (a.status !== 'open' && b.status === 'open') return 1;
         return 0;
     });
 
-    const getStatusClass = (status) => {
-        const statusClasses = {
-            'open': 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20',
-            'in progress': 'bg-cyan-500/10 text-cyan-400 border border-cyan-500/20',
-            'completed': 'bg-slate-800 text-slate-400 border border-slate-700'
-        };
-
-        return statusClasses[status] || 'bg-purple-500/10 text-purple-400 border border-purple-500/20';
-    };
-
     return (
-        <div className="w-full bg-slate-950 p-4 md:p-8 min-h-screen">
-            <Card className="w-full max-w-5xl mx-auto rounded-2xl border border-slate-900 bg-slate-900/40 backdrop-blur-md p-6 shadow-2xl">
-
-                <div className="flex items-center justify-between pb-6 border-b border-slate-900">
-                    <div className="flex items-center gap-2">
-                        <div className="w-2 h-6 bg-emerald-500 rounded-full" />
-                        <h2 className="text-xl font-bold text-slate-100 tracking-tight">My Tasks</h2>
-                    </div>
-                    <Link href="/dashboard/client/my-tasks/all" className="text-xs font-semibold text-emerald-400 hover:underline transition-all">
-                        View All
-                    </Link>
+        <div className="w-full space-y-5">
+            {/* Header */}
+            <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2.5">
+                    <div className="w-1 h-6 rounded-full bg-emerald-500" />
+                    <h2 className="text-xl font-bold tracking-tight" style={{ color: "var(--text-heading)" }}>
+                        My Tasks
+                    </h2>
                 </div>
-                <div className="w-full overflow-x-auto mt-4">
-                    <table className="w-full border-collapse text-left text-sm">
+                <Link
+                    href="/dashboard/client/my-tasks/all"
+                    className="text-xs font-semibold text-emerald-500 hover:text-emerald-600 transition-colors"
+                >
+                    View All →
+                </Link>
+            </div>
+
+            {/* Table card */}
+            <div
+                className="rounded-2xl overflow-hidden"
+                style={{ background: "var(--bg-card)", border: "1px solid var(--border-color)", boxShadow: "var(--shadow-sm)" }}
+            >
+                <div className="w-full overflow-x-auto">
+                    <table className="w-full border-collapse text-left text-sm min-w-[560px]">
                         <thead>
-                            <tr className="border-b border-slate-900 text-xs font-bold uppercase tracking-wider text-slate-500">
-                                <th className="py-4 px-4">Title</th>
-                                <th className="py-4 px-4">Budget</th>
-                                <th className="py-4 px-4">Status</th>
-                                <th className="py-4 px-4 text-right">Actions</th>
+                            <tr
+                                className="text-xs font-bold uppercase tracking-wider"
+                                style={{
+                                    background: "var(--bg-secondary)",
+                                    borderBottom: "1px solid var(--border-color)",
+                                    color: "var(--text-muted)",
+                                }}
+                            >
+                                <th className="px-5 py-3.5">Title</th>
+                                <th className="px-5 py-3.5">Budget</th>
+                                <th className="px-5 py-3.5">Status</th>
+                                <th className="px-5 py-3.5 text-right">Actions</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-slate-900/50">
+                        <tbody>
                             {sortedTasks.length === 0 ? (
                                 <tr>
-                                    <td colSpan="4" className="py-8 text-center text-sm text-slate-500">
-                                        No tasks posted yet.
+                                    <td
+                                        colSpan="4"
+                                        className="py-12 text-center text-sm"
+                                        style={{ color: "var(--text-muted)" }}
+                                    >
+                                        No tasks posted yet.{" "}
+                                        <Link href="/dashboard/client/manage-task/new" className="text-emerald-500 font-semibold hover:underline">
+                                            Post your first task →
+                                        </Link>
                                     </td>
                                 </tr>
                             ) : (
-                                sortedTasks.map((task) => (
-                                    <tr key={task._id} className="group hover:bg-slate-900/20 transition-all duration-150">
+                                sortedTasks.map((task) => {
+                                    const sc = statusConfig[task.status] || { bg: "rgba(139,92,246,0.08)", border: "rgba(139,92,246,0.2)", color: "#8b5cf6" };
+                                    return (
+                                        <tr
+                                            key={task._id}
+                                            className="group transition-colors"
+                                            style={{ borderBottom: "1px solid var(--border-color)" }}
+                                            onMouseEnter={e => e.currentTarget.style.background = "var(--bg-secondary)"}
+                                            onMouseLeave={e => e.currentTarget.style.background = "transparent"}
+                                        >
+                                            {/* Title */}
+                                            <td className="p-0 max-w-[280px]">
+                                                <Link
+                                                    href={`/dashboard/client/manage-task/${task._id}`}
+                                                    className="flex flex-col gap-1 py-4 px-5 w-full block"
+                                                >
+                                                    <span
+                                                        className="font-semibold truncate transition-colors group-hover:text-emerald-500"
+                                                        style={{ color: "var(--text-heading)" }}
+                                                    >
+                                                        {task.title}
+                                                    </span>
+                                                    <span
+                                                        className="text-xs flex items-center gap-1"
+                                                        style={{ color: "var(--text-muted)" }}
+                                                    >
+                                                        <Calendar className="w-3.5 h-3.5" />
+                                                        Deadline: {task.deadline}
+                                                    </span>
+                                                </Link>
+                                            </td>
 
-                                  
-                                        <td className="p-0 max-w-[280px] sm:max-w-xs">
-                                            <Link 
-                                                href={`/dashboard/client/manage-task/${task._id}`}
-                                                className="flex flex-col gap-1 py-5 px-4 w-full h-full block group-hover:text-purple-400 transition-colors"
-                                            >
-                                                <span className="font-semibold text-slate-200 group-hover:text-purple-400 transition-colors block truncate">
-                                                    {task.title}
+                                            {/* Budget */}
+                                            <td className="px-5 py-4 font-bold text-emerald-500 whitespace-nowrap">
+                                                ${Number(task.budget).toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                                            </td>
+
+                                            {/* Status */}
+                                            <td className="px-5 py-4">
+                                                <span
+                                                    className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wide whitespace-nowrap"
+                                                    style={{ background: sc.bg, border: `1px solid ${sc.border}`, color: sc.color }}
+                                                >
+                                                    {task.status}
                                                 </span>
-                                                <span className="text-xs text-slate-500 flex items-center gap-1">
-                                                    <Calendar className="w-3.5 h-3.5" />
-                                                    Deadline: {task.deadline}
-                                                </span>
-                                            </Link>
-                                        </td>
+                                            </td>
 
-                                        <td className="py-5 px-4 font-bold text-slate-300">
-                                            ${Number(task.budget).toLocaleString('en-US', { minimumFractionDigits: 2 })}
-                                        </td>
-                                        <td className="py-5 px-4">
-                                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wide ${getStatusClass(task.status)}`}>
-                                                {task.status}
-                                            </span>
-                                        </td>
-                                        <td className="py-5 px-4 text-right">
-                                            <div className="flex items-center justify-end gap-2">
-                                                {task.status === 'open' ? (
-                                                    <>
-                                                     
-                                                        <TaskUpdateModal onEdit={onEdit} task={task}></TaskUpdateModal>
-                                                        <DeleteAlert onDelete={onDelete} task={task}></DeleteAlert>
-                                                    </>
-                                                ) : (
-                                                    <Link href={`/dashboard/client/manage-task/${task._id}`}>
-                                                        <Button
-                                                            isIconOnly
-                                                            size="sm"
-                                                            variant="light"
-                                                            className="text-slate-500 hover:text-slate-300 hover:bg-slate-800 rounded-lg transition-colors"
-                                                            title="View Details"
-                                                        >
-                                                            <Eye className="w-4 h-4" />
-                                                        </Button>
-                                                    </Link>
-                                                )}
-                                            </div>
-                                        </td>
-
-                                    </tr>
-                                ))
+                                            {/* Actions */}
+                                            <td className="px-5 py-4 text-right">
+                                                <div className="flex items-center justify-end gap-1.5">
+                                                    {task.status === 'open' ? (
+                                                        <>
+                                                            <TaskUpdateModal onEdit={onEdit} task={task} />
+                                                            <DeleteAlert onDelete={onDelete} task={task} />
+                                                        </>
+                                                    ) : (
+                                                        <Link href={`/dashboard/client/manage-task/${task._id}`}>
+                                                            <button
+                                                                className="p-1.5 rounded-lg transition-colors hover:text-emerald-500"
+                                                                style={{ color: "var(--text-muted)" }}
+                                                                title="View Details"
+                                                            >
+                                                                <Eye className="w-4 h-4" />
+                                                            </button>
+                                                        </Link>
+                                                    )}
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    );
+                                })
                             )}
                         </tbody>
                     </table>
                 </div>
-
-            </Card>
+            </div>
         </div>
     );
 };

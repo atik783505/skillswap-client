@@ -1,96 +1,145 @@
 'use client';
 import { Link, Button } from "@heroui/react";
-// Gravity UI থেকে প্রয়োজনীয় আইকনগুলো ইম্পোর্ট করা হয়েছে
 import { Globe, ArrowRight } from "@gravity-ui/icons";
 import { FaXTwitter } from "react-icons/fa6";
 import { usePathname } from "next/navigation";
 
-// মডার্ন স্কিল সোয়াপ আইকন লোগো
 const SkillSwapLogo = () => (
-
-  <svg
-    className="h-6 w-6 text-emerald-500"
-    fill="none"
-    viewBox="0 0 24 24"
-    stroke="currentColor"
-    strokeWidth={2.5}
-  >
+  <svg className="h-5 w-5 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
     <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
   </svg>
 );
 
 export default function Footer() {
-    const pathname = usePathname();
-    if (pathname.includes('/dashboard')) {
-        return null;
-    }
+  const pathname = usePathname();
+  if (pathname.includes('/dashboard')) return null;
+
   return (
-    <footer className="w-full border-t border-slate-900 bg-slate-950 text-slate-400 py-12 px-6 md:px-12">
-      <div className="w-11/12 mx-auto grid grid-cols-1 md:grid-cols-4 gap-8 mb-10">
-        
-        <div className="flex flex-col gap-4">
-          <div className="flex items-center gap-2">
-            <SkillSwapLogo />
-            <p className="font-bold text-xl tracking-tight text-white">
-              Skill<span className="text-emerald-500">Swap</span>
+    <footer
+      className="w-full transition-colors"
+      style={{
+        background: "var(--bg-secondary)",
+        borderTop: "1px solid var(--border-color)",
+        color: "var(--text-secondary)",
+      }}
+    >
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-10 mb-10">
+
+          {/* Brand */}
+          <div className="flex flex-col gap-4">
+            <div className="flex items-center gap-2.5">
+              <div
+                className="p-2 rounded-xl border"
+                style={{ background: "rgba(16,185,129,0.08)", borderColor: "rgba(16,185,129,0.2)" }}
+              >
+                <SkillSwapLogo />
+              </div>
+              <p className="font-bold text-xl" style={{ color: "var(--text-heading)" }}>
+                Skill<span className="text-emerald-500">Swap</span>
+              </p>
+            </div>
+            <p className="text-xs leading-relaxed max-w-xs" style={{ color: "var(--text-muted)" }}>
+              The premium micro-tasking ecosystem for the modern era. Quality execution, guaranteed.
             </p>
+            <div className="flex items-center gap-3.5 mt-1">
+              <button
+                className="p-2 rounded-lg transition-colors hover:text-emerald-500"
+                style={{ color: "var(--text-muted)", background: "var(--bg-card)", border: "1px solid var(--border-color)" }}
+                aria-label="Twitter"
+              >
+                <FaXTwitter className="h-4 w-4" />
+              </button>
+              <button
+                className="p-2 rounded-lg transition-colors hover:text-emerald-500"
+                style={{ color: "var(--text-muted)", background: "var(--bg-card)", border: "1px solid var(--border-color)" }}
+                aria-label="Website"
+              >
+                <Globe className="h-4 w-4" />
+              </button>
+            </div>
           </div>
-          <p className="text-xs leading-relaxed text-slate-500 max-w-xs">
-            The premium micro-tasking ecosystem for the modern era. Quality execution, guaranteed.
-          </p>
-          <div className="flex items-center gap-4 mt-2">
-            <FaXTwitter className="h-5 w-5 text-slate-400 hover:text-white transition-colors cursor-pointer" />
-            <Globe className="h-5 w-5 text-slate-400 hover:text-white transition-colors cursor-pointer" />
-          </div>
-        </div>
 
-        <div className="flex flex-col gap-3">
-          <h4 className="text-sm font-semibold text-white tracking-wide">Marketplace</h4>
-          <ul className="flex flex-col gap-2 text-xs">
-            <li><Link href="/" className="text-slate-500 hover:text-emerald-400 transition-colors">Home</Link></li>
-            <li><Link href="/all-tasks" className="text-slate-500 hover:text-emerald-400 transition-colors">Browse Tasks</Link></li>
-            <li><Link href="/freelancers" className="text-slate-500 hover:text-emerald-400 transition-colors">Browse Freelancers</Link></li>
-          </ul>
-        </div>
-        <div className="flex flex-col gap-3">
-          <h4 className="text-sm font-semibold text-white tracking-wide">Legal</h4>
-          <ul className="flex flex-col gap-2 text-xs">
-            <li><Link href="/terms" className="text-slate-500 hover:text-emerald-400 transition-colors">Terms of Service</Link></li>
-            <li><Link href="/privacy" className="text-slate-500 hover:text-emerald-400 transition-colors">Privacy Policy</Link></li>
-            <li><Link href="/security" className="text-slate-500 hover:text-emerald-400 transition-colors">Security</Link></li>
-          </ul>
-        </div>
-
-        <div className="flex flex-col gap-3">
-          <h4 className="text-sm font-semibold text-white tracking-wide">Contact Support</h4>
-          <div className="text-xs">
-            <p className="text-slate-500">Need help with a project?</p>
-            <Link href="mailto:support@skillswap.com" className="text-emerald-400 font-medium hover:underline mt-1 block">
-              atik13672@gmail.com
-            </Link>
+          {/* Marketplace */}
+          <div className="flex flex-col gap-3">
+            <h4 className="text-xs font-bold uppercase tracking-widest" style={{ color: "var(--text-heading)" }}>
+              Marketplace
+            </h4>
+            <ul className="flex flex-col gap-2.5 text-sm">
+              {[
+                { label: "Home", href: "/" },
+                { label: "Browse Tasks", href: "/all-tasks" },
+                { label: "Browse Freelancers", href: "/freelancers" },
+              ].map(({ label, href }) => (
+                <li key={href}>
+                  <Link href={href} className="transition-colors hover:text-emerald-500 text-sm" style={{ color: "var(--text-secondary)" }}>
+                    {label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
           </div>
-          <div className="flex items-center bg-slate-900 border border-slate-800 rounded-md p-1 mt-2 focus-within:border-slate-700 transition-all">
-            <input 
-              type="email" 
-              placeholder="Task updates via email" 
-              className="bg-transparent text-xs text-white px-3 py-1.5 outline-none w-full placeholder:text-slate-600"
-            />
-            <Button 
-              isIconOnly
-              size="sm"
-              className="bg-transparent text-emerald-500 hover:text-emerald-400 min-w-0 p-1"
-              aria-label="Subscribe"
+
+          {/* Legal */}
+          <div className="flex flex-col gap-3">
+            <h4 className="text-xs font-bold uppercase tracking-widest" style={{ color: "var(--text-heading)" }}>
+              Legal
+            </h4>
+            <ul className="flex flex-col gap-2.5 text-sm">
+              {[
+                { label: "Terms of Service", href: "/terms" },
+                { label: "Privacy Policy", href: "/privacy" },
+                { label: "Security", href: "/security" },
+              ].map(({ label, href }) => (
+                <li key={href}>
+                  <Link href={href} className="transition-colors hover:text-emerald-500 text-sm" style={{ color: "var(--text-secondary)" }}>
+                    {label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Newsletter */}
+          <div className="flex flex-col gap-3">
+            <h4 className="text-xs font-bold uppercase tracking-widest" style={{ color: "var(--text-heading)" }}>
+              Stay Updated
+            </h4>
+            <div className="text-xs">
+              <p style={{ color: "var(--text-muted)" }}>Questions or support?</p>
+              <Link href="mailto:support@skillswap.com" className="text-emerald-500 font-medium hover:underline mt-1 block text-sm">
+                atik13672@gmail.com
+              </Link>
+            </div>
+            <div
+              className="flex items-center rounded-xl overflow-hidden mt-1"
+              style={{ background: "var(--bg-card)", border: "1px solid var(--border-color)" }}
             >
-              <ArrowRight className="h-4 w-4" />
-            </Button>
+              <input
+                type="email"
+                placeholder="Your email address"
+                className="bg-transparent text-xs px-3 py-2.5 outline-none w-full"
+                style={{ color: "var(--text-primary)" }}
+              />
+              <button
+                className="px-3 py-2.5 text-emerald-500 hover:text-emerald-400 transition-colors shrink-0"
+                aria-label="Subscribe"
+              >
+                <ArrowRight className="h-4 w-4" />
+              </button>
+            </div>
           </div>
+
         </div>
 
-      </div>
-      <div className="w-11/12 mx-auto max-w-5xl border-t border-slate-900 pt-6 text-center">
-        <p className="text-xxs text-slate-600">
-          © 2026 SkillSwap. All rights reserved.
-        </p>
+        {/* Bottom bar */}
+        <div
+          className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs border-t"
+          style={{ borderColor: "var(--border-color)", color: "var(--text-muted)" }}
+        >
+          <p>© 2026 SkillSwap. All rights reserved.</p>
+          <p>Built with ❤️ for the global freelance community</p>
+        </div>
       </div>
     </footer>
   );

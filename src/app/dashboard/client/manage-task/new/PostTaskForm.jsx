@@ -1,38 +1,52 @@
 'use client';
 import React, { useState } from 'react';
-import {
-    Form,
-    TextField,
-    Label,
-    Input,
-    TextArea,
-    Select,
-    ListBox,
-    Button,
-    Card,
-    CardHeader,
-} from '@heroui/react';
+import { Form, Select, ListBox, Button, Card } from '@heroui/react';
 import { useSession } from '@/lib/auth-client';
 import toast from 'react-hot-toast';
 import { MdAddTask } from 'react-icons/md';
 import { postTask } from '@/lib/actions/tasks';
+
+const inputStyle = {
+    background: "var(--bg-input)",
+    border: "1px solid var(--border-color)",
+    color: "var(--text-primary)",
+    borderRadius: "12px",
+    padding: "10px 16px",
+    width: "100%",
+    fontSize: "14px",
+    outline: "none",
+    transition: "border-color 0.15s",
+};
+
+function FieldWrapper({ label, children }) {
+    return (
+        <div className="flex flex-col gap-1.5 w-full">
+            <label
+                className="text-xs font-bold uppercase tracking-wider"
+                style={{ color: "var(--text-secondary)" }}
+            >
+                {label} <span className="text-rose-500">*</span>
+            </label>
+            {children}
+        </div>
+    );
+}
 
 const PostTaskForm = () => {
     const [loading, setLoading] = useState(false);
     const { data } = useSession();
     const user = data?.user;
 
+    const handleFocus = (e) => { e.currentTarget.style.borderColor = "#8b5cf6"; };
+    const handleBlur = (e) => { e.currentTarget.style.borderColor = "var(--border-color)"; };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
-
-        const currentForm = e.currentTarget; 
+        const currentForm = e.currentTarget;
         const formData = new FormData(currentForm);
         const taskFields = Object.fromEntries(formData.entries());
-
-        if (taskFields.budget) {
-            taskFields.budget = Number(taskFields.budget);
-        }
+        if (taskFields.budget) taskFields.budget = Number(taskFields.budget);
 
         const finalData = {
             ...taskFields,
@@ -41,23 +55,18 @@ const PostTaskForm = () => {
             clientId: user?.id,
             clientImage: user?.image,
             status: "open",
-            deliverable_url: ""
+            deliverable_url: "",
         };
-
-        console.log(finalData);
 
         try {
             const res = await postTask(finalData);
-            console.log("Server Response:", res);
-
             if (res && res.acknowledged) {
-                toast.success('Task Published Successfully');
-                currentForm.reset(); 
+                toast.success('Task Published Successfully!');
+                currentForm.reset();
             } else {
                 toast.error(res?.error || 'Error publishing your task');
             }
-        } catch (error) {
-            console.error("Client Submit Error:", error);
+        } catch {
             toast.error('Something went wrong!');
         } finally {
             setLoading(false);
@@ -65,81 +74,162 @@ const PostTaskForm = () => {
     };
 
     return (
-        <div className="w-full min-h-[calc(100vh-4rem)] flex items-center justify-center p-4 md:p-8 bg-slate-950">
-            <Card className="w-full max-w-2xl rounded-2xl border border-slate-900 bg-slate-900/40 backdrop-blur-md p-6 md:p-8 shadow-2xl shadow-purple-950/10">
-                <CardHeader className="flex flex-col items-start gap-1.5 pb-8 px-0">
-                    <div className="flex items-center gap-2 text-emerald-400">
-                        <MdAddTask className="text-2xl" />
-                        <h2 className="text-2xl font-bold tracking-tight text-slate-100">Post a Task</h2>
+        <div className="w-full flex items-start justify-center">
+            <div
+                className="w-full max-w-2xl rounded-2xl p-6 md:p-8"
+                style={{
+                    background: "var(--bg-card)",
+                    border: "1px solid var(--border-color)",
+                    boxShadow: "var(--shadow-md)",
+                }}
+            >
+                {/* Header */}
+                <div
+                    className="flex items-center gap-3 pb-6 mb-6"
+                    style={{ borderBottom: "1px solid var(--border-color)" }}
+                >
+                    <div
+                        className="p-2.5 rounded-xl"
+                        style={{ background: "rgba(16,185,129,0.08)", border: "1px solid rgba(16,185,129,0.2)" }}
+                    >
+                        <MdAddTask className="text-xl text-emerald-500" />
                     </div>
-                    <p className="text-sm text-slate-400">Fill in the details below to publish a new project block on the platform.</p>
-                </CardHeader>
+                    <div>
+                        <h2 className="text-xl font-bold tracking-tight" style={{ color: "var(--text-heading)" }}>
+                            Post a Task
+                        </h2>
+                        <p className="text-xs mt-0.5" style={{ color: "var(--text-muted)" }}>
+                            Fill in the details below to publish a new project on the platform.
+                        </p>
+                    </div>
+                </div>
 
-                <Form onSubmit={handleSubmit} className="w-full space-y-6">
-                    <TextField name="title" isRequired className="w-full flex flex-col gap-2">
-                        <Label className="text-xs font-semibold uppercase tracking-wider text-slate-400">Task Title</Label>
-                        <Input
-                            className="rounded-xl border border-slate-800 bg-slate-950/60 px-4 py-2.5 text-slate-200 placeholder-slate-600 focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all duration-200"
-                            placeholder="e.g. Website Bug Fix"
+                <Form onSubmit={handleSubmit} className="w-full space-y-5">
+                    {/* Title */}
+                    <FieldWrapper label="Task Title">
+                        <input
+                            name="title"
+                            required
+                            placeholder="e.g. Website Bug Fix, Logo Design..."
+                            style={inputStyle}
+                            onFocus={handleFocus}
+                            onBlur={handleBlur}
                         />
-                    </TextField>
+                    </FieldWrapper>
 
-                    <div className="w-full flex flex-col gap-2">
-                        <Label className="text-xs font-semibold uppercase tracking-wider text-slate-400">Category</Label>
-                        <Select name="category" isRequired className="w-full" placeholder="Select Category">
-                            <Select.Trigger className="rounded-xl border border-slate-800 bg-slate-950/60 px-4 py-2.5 text-slate-200 focus:border-purple-500 transition-all duration-200">
-                                <Select.Value className="text-slate-300" />
-                                <Select.Indicator className="text-slate-500" />
+                    {/* Category */}
+                    <FieldWrapper label="Category">
+                        <Select name="category" isRequired placeholder="Select a category">
+                            <Select.Trigger
+                                className="rounded-xl text-sm h-[42px]"
+                                style={{
+                                    background: "var(--bg-input)",
+                                    border: "1px solid var(--border-color)",
+                                    color: "var(--text-primary)",
+                                }}
+                            >
+                                <Select.Value />
+                                <Select.Indicator style={{ color: "var(--text-muted)" }} />
                             </Select.Trigger>
-                            <Select.Popover className="border border-slate-800 bg-slate-900 text-slate-200 rounded-xl shadow-xl">
+                            <Select.Popover
+                                className="rounded-xl shadow-xl"
+                                style={{
+                                    background: "var(--bg-card)",
+                                    border: "1px solid var(--border-color)",
+                                }}
+                            >
                                 <ListBox className="p-1">
-                                    <ListBox.Item id="Development" textValue="Development" className="rounded-lg px-3 py-2 text-sm hover:bg-purple-600 hover:text-white transition-colors">Development<ListBox.ItemIndicator /></ListBox.Item>
-                                    <ListBox.Item id="Design" textValue="Design" className="rounded-lg px-3 py-2 text-sm hover:bg-purple-600 hover:text-white transition-colors">Design<ListBox.ItemIndicator /></ListBox.Item>
-                                    <ListBox.Item id="Marketing" textValue="Marketing" className="rounded-lg px-3 py-2 text-sm hover:bg-purple-600 hover:text-white transition-colors">Marketing<ListBox.ItemIndicator /></ListBox.Item>
-                                    <ListBox.Item id="Writing" textValue="Writing" className="rounded-lg px-3 py-2 text-sm hover:bg-purple-600 hover:text-white transition-colors">Writing<ListBox.ItemIndicator /></ListBox.Item>
+                                    {['Development', 'Design', 'Marketing', 'Writing', 'Other'].map(cat => (
+                                        <ListBox.Item
+                                            key={cat}
+                                            id={cat}
+                                            textValue={cat}
+                                            className="rounded-lg px-3 py-2 text-sm cursor-pointer transition-colors hover:bg-purple-500/10 hover:text-purple-500"
+                                            style={{ color: "var(--text-primary)" }}
+                                        >
+                                            {cat}
+                                            <ListBox.ItemIndicator />
+                                        </ListBox.Item>
+                                    ))}
                                 </ListBox>
                             </Select.Popover>
                         </Select>
-                    </div>
+                    </FieldWrapper>
 
-                    <TextField name="description" isRequired className="w-full flex flex-col gap-2">
-                        <Label className="text-xs font-semibold uppercase tracking-wider text-slate-400">Description</Label>
-                        <TextArea
-                            className="rounded-xl border border-slate-800 bg-slate-950/60 px-4 py-2.5 text-slate-200 placeholder-slate-600 min-h-[140px] focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all duration-200 resize-none"
-                            placeholder="Describe the detailed specifications and scope of requirements..."
+                    {/* Description */}
+                    <FieldWrapper label="Description">
+                        <textarea
+                            name="description"
+                            required
+                            rows={5}
+                            placeholder="Describe the requirements, scope, and expected deliverables..."
+                            style={{ ...inputStyle, resize: "none", lineHeight: "1.6" }}
+                            onFocus={handleFocus}
+                            onBlur={handleBlur}
                         />
-                    </TextField>
+                    </FieldWrapper>
 
+                    {/* Budget + Deadline */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                        <TextField name="budget" isRequired className="w-full flex flex-col gap-2">
-                            <Label className="text-xs font-semibold uppercase tracking-wider text-slate-400">Budget ($ USD)</Label>
-                            <Input
-                                type="number"
-                                min="1"
-                                className="rounded-xl border border-slate-800 bg-slate-950/60 px-4 py-2.5 text-slate-200 placeholder-slate-600 focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all duration-200"
-                                placeholder="50.00"
-                            />
-                        </TextField>
-
-                        <TextField name="deadline" isRequired className="w-full flex flex-col gap-2">
-                            <Label className="text-xs font-semibold uppercase tracking-wider text-slate-400">Deadline Date</Label>
-                            <Input
+                        <FieldWrapper label="Budget (USD)">
+                            <div className="relative">
+                                <span
+                                    className="absolute left-4 top-1/2 -translate-y-1/2 font-bold text-sm pointer-events-none"
+                                    style={{ color: "var(--text-muted)" }}
+                                >
+                                    $
+                                </span>
+                                <input
+                                    name="budget"
+                                    type="number"
+                                    min="1"
+                                    required
+                                    placeholder="50"
+                                    style={{ ...inputStyle, paddingLeft: "28px" }}
+                                    onFocus={handleFocus}
+                                    onBlur={handleBlur}
+                                />
+                            </div>
+                        </FieldWrapper>
+                        <FieldWrapper label="Deadline">
+                            <input
+                                name="deadline"
                                 type="date"
-                                className="rounded-xl border border-slate-800 bg-slate-950/60 px-4 py-2.5 text-slate-200 focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all duration-200 [color-scheme:dark]"
+                                required
+                                style={{ ...inputStyle, colorScheme: "auto" }}
+                                onFocus={handleFocus}
+                                onBlur={handleBlur}
                             />
-                        </TextField>
+                        </FieldWrapper>
                     </div>
 
-                    <Button
+                    <button
                         type="submit"
-                        variant="primary"
-                        className="w-full font-semibold rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 py-3 mt-4 shadow-lg shadow-emerald-500/10 transition-all duration-200 active:scale-[0.99]"
-                        isLoading={loading}
+                        disabled={loading}
+                        className="w-full h-11 rounded-xl text-sm font-bold text-white transition-all mt-2 flex items-center justify-center gap-2"
+                        style={{
+                            background: "linear-gradient(135deg, #10b981, #059669)",
+                            boxShadow: "0 4px 14px rgba(16,185,129,0.3)",
+                            opacity: loading ? 0.7 : 1,
+                        }}
                     >
-                        {loading ? "Publishing..." : "Publish Task"}
-                    </Button>
+                        {loading ? (
+                            <>
+                                <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                                </svg>
+                                Publishing…
+                            </>
+                        ) : (
+                            <>
+                                <MdAddTask className="text-lg" />
+                                Publish Task
+                            </>
+                        )}
+                    </button>
                 </Form>
-            </Card>
+            </div>
         </div>
     );
 };

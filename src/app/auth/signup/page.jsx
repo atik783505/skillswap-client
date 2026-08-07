@@ -1,267 +1,276 @@
 "use client";
 import { useState } from "react";
-import {
-    Button,
-    Card,
-    Description,
-    FieldError,
-    Form,
-    Input,
-    Label,
-    TextField,
-} from "@heroui/react";
 import Link from "next/link";
 import { FcGoogle } from "react-icons/fc";
 import { Briefcase, Person } from "@gravity-ui/icons";
 import { authClient, signUp } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
+import { motion, AnimatePresence } from "framer-motion";
+
+const SkillSwapLogo = () => (
+  <svg className="h-6 w-6 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+    <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+  </svg>
+);
+
+function Field({ label, name, type = "text", placeholder, hint, required }) {
+  return (
+    <div className="flex flex-col gap-1.5">
+      {label && (
+        <label className="text-xs font-semibold uppercase tracking-wider" style={{ color: "var(--text-secondary)" }}>
+          {label} {required && <span className="text-rose-500">*</span>}
+        </label>
+      )}
+      <input
+        type={type}
+        name={name}
+        required={required}
+        placeholder={placeholder}
+        className="w-full px-4 py-2.5 rounded-xl text-sm outline-none transition-all"
+        style={{
+          background: "var(--bg-input)",
+          border: "1px solid var(--border-color)",
+          color: "var(--text-primary)",
+        }}
+        onFocus={e => e.currentTarget.style.borderColor = "#10b981"}
+        onBlur={e => e.currentTarget.style.borderColor = "var(--border-color)"}
+      />
+      {hint && <p className="text-[11px]" style={{ color: "var(--text-muted)" }}>{hint}</p>}
+    </div>
+  );
+}
 
 export default function Signup() {
-    const [selectedRole, setSelectedRole] = useState('client');
-    const router = useRouter();
+  const [selectedRole, setSelectedRole] = useState('client');
+  const router = useRouter();
 
-    const onSubmit = async (e) => {
-        e.preventDefault();
-        const formData = new FormData(e.currentTarget);
-        
-        const name = formData.get("name");
-        const email = formData.get("email");
-        const password = formData.get("password");
-        const image = formData.get("image");
-        const bio = formData.get("bio");
-        const hourlyRate = formData.get("hourlyRate");
-        const skillsString = formData.get("skills");
-        const skills = skillsString 
-            ? skillsString.split(",").map(skill => skill.trim()).filter(Boolean) 
-            : [];
+  const onSubmit = async (e) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    const name = formData.get("name");
+    const email = formData.get("email");
+    const password = formData.get("password");
+    const image = formData.get("image");
+    const bio = formData.get("bio");
+    const hourlyRate = formData.get("hourlyRate");
+    const skillsString = formData.get("skills");
+    const skills = skillsString ? skillsString.split(",").map(s => s.trim()).filter(Boolean) : [];
 
-        const { data, error } = await signUp.email({
-            name,
-            email,
-            password,
-            image: image || undefined, 
-            role: selectedRole,
-            ...(selectedRole === 'freelancer' && {
-                bio: bio || "",
-                skills: skills,
-                hourlyRate: hourlyRate ? Number(hourlyRate) : 0,
-            })
-        });
+    const { data, error } = await signUp.email({
+      name, email, password,
+      image: image || undefined,
+      role: selectedRole,
+      ...(selectedRole === 'freelancer' && {
+        bio: bio || "",
+        skills,
+        hourlyRate: hourlyRate ? Number(hourlyRate) : 0,
+      }),
+    });
 
-        if (error) {
-            alert(`Error: ${error.message}`);
-        } else {
-            toast.success("Account created successfully! Please check your email to verify your account.");
-            router.push(`/dashboard/${data?.user?.role}`);
-        }
-    };
+    if (error) {
+      toast.error(error.message || "Registration failed");
+    } else {
+      toast.success("Account created! Redirecting…");
+      router.push(`/dashboard/${data?.user?.role}`);
+    }
+  };
 
-    const handleGoogleSignIn = async () => {
-        try {
-            await authClient.signIn.social({
-                provider: "google",
-                callbackURL: "/",
-            });
-        } catch (error) {
-            console.error("Google sign in failed:", error);
-        }
-    };
+  const handleGoogleSignIn = async () => {
+    try {
+      await authClient.signIn.social({ provider: "google", callbackURL: "/" });
+    } catch {
+      toast.error("Google sign-in failed.");
+    }
+  };
 
-    return (
-        <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4">
-            <Card className="w-full max-w-xl bg-slate-900 border border-slate-800 p-8 rounded-2xl text-white shadow-2xl">
-                <div className="text-center mb-6">
-                    <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-white mb-2">
-                        Create Account
-                    </h2>
-                    <p className="text-xs sm:text-sm text-slate-400">
-                        Join the elite network of freelancers and clients today.
-                    </p>
-                </div>
+  const roles = [
+    { id: 'client', label: "I'm a Client", icon: Briefcase, desc: "Post tasks & hire" },
+    { id: 'freelancer', label: "I'm a Freelancer", icon: Person, desc: "Find work & earn" },
+  ];
 
-                <Button
-                    variant="flat"
-                    className="w-full bg-slate-800/80 hover:bg-slate-800 text-slate-200 border border-slate-700 font-medium py-2.5 rounded-lg transition-all flex items-center justify-center gap-2 text-sm"
-                    onClick={handleGoogleSignIn}
+  return (
+    <div
+      className="min-h-screen flex items-center justify-center px-4 py-12"
+      style={{ background: "var(--bg-primary)" }}
+    >
+      <div
+        className="fixed inset-0 pointer-events-none"
+        style={{ background: "radial-gradient(ellipse 60% 40% at 50% 20%, rgba(16,185,129,0.05) 0%, transparent 100%)" }}
+      />
+
+      <motion.div
+        initial={{ opacity: 0, y: 24 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="relative z-10 w-full max-w-xl"
+      >
+        <div
+          className="rounded-3xl p-8 sm:p-10"
+          style={{
+            background: "var(--bg-card)",
+            border: "1px solid var(--border-color)",
+            boxShadow: "var(--shadow-lg)",
+          }}
+        >
+          {/* Header */}
+          <div className="flex flex-col items-center gap-2 mb-8">
+            <div
+              className="p-3 rounded-2xl mb-1"
+              style={{ background: "rgba(16,185,129,0.1)", border: "1px solid rgba(16,185,129,0.2)" }}
+            >
+              <SkillSwapLogo />
+            </div>
+            <h1 className="text-2xl font-extrabold tracking-tight" style={{ color: "var(--text-heading)" }}>
+              Create Account
+            </h1>
+            <p className="text-sm text-center" style={{ color: "var(--text-secondary)" }}>
+              Join the elite network of freelancers and clients today
+            </p>
+          </div>
+
+          {/* Google */}
+          <button
+            type="button"
+            onClick={handleGoogleSignIn}
+            className="w-full flex items-center justify-center gap-3 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all mb-5"
+            style={{
+              background: "var(--bg-secondary)",
+              border: "1px solid var(--border-color)",
+              color: "var(--text-primary)",
+            }}
+            onMouseEnter={e => e.currentTarget.style.borderColor = "#10b981"}
+            onMouseLeave={e => e.currentTarget.style.borderColor = "var(--border-color)"}
+          >
+            <FcGoogle className="text-lg shrink-0" />
+            Continue with Google
+          </button>
+
+          {/* Divider */}
+          <div className="flex items-center gap-3 mb-5">
+            <div className="flex-1 h-px" style={{ background: "var(--border-color)" }} />
+            <span className="text-[11px] font-semibold uppercase tracking-widest" style={{ color: "var(--text-muted)" }}>
+              or register
+            </span>
+            <div className="flex-1 h-px" style={{ background: "var(--border-color)" }} />
+          </div>
+
+          <form onSubmit={onSubmit} className="flex flex-col gap-4">
+            {/* Basic fields */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <Field label="Full Name" name="name" placeholder="Alex Rivers" required />
+              <Field label="Email" name="email" type="email" placeholder="you@example.com" required />
+            </div>
+            <Field label="Profile Image URL" name="image" type="url" placeholder="https://…/avatar.jpg" />
+            <Field
+              label="Password"
+              name="password"
+              type="password"
+              placeholder="••••••••"
+              required
+              hint="6+ characters, uppercase and lowercase required"
+            />
+
+            {/* Role picker */}
+            <div className="flex flex-col gap-2 mt-1">
+              <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: "var(--text-secondary)" }}>
+                Choose your role
+              </p>
+              <div className="grid grid-cols-2 gap-3">
+                {roles.map(({ id, label, icon: Icon, desc }) => {
+                  const isActive = selectedRole === id;
+                  return (
+                    <button
+                      key={id}
+                      type="button"
+                      onClick={() => setSelectedRole(id)}
+                      className="flex flex-col items-center gap-1.5 p-3.5 rounded-xl transition-all text-center"
+                      style={{
+                        background: isActive ? "rgba(16,185,129,0.1)" : "var(--bg-secondary)",
+                        border: isActive ? "2px solid #10b981" : "2px solid var(--border-color)",
+                        color: isActive ? "#10b981" : "var(--text-secondary)",
+                      }}
+                    >
+                      <Icon className="w-5 h-5" />
+                      <span className="text-xs font-bold">{label}</span>
+                      <span className="text-[10px]" style={{ color: isActive ? "#10b981" : "var(--text-muted)" }}>
+                        {desc}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Freelancer extra fields */}
+            <AnimatePresence>
+              {selectedRole === 'freelancer' && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                  exit={{ opacity: 0, height: 0 }}
+                  transition={{ duration: 0.3 }}
+                  className="overflow-hidden"
                 >
-                    <FcGoogle className="text-lg shrink-0" />
-                    <span>Sign up with Google</span>
-                </Button>
-
-                <div className="flex items-center my-6 w-full">
-                    <hr className="flex-1 border-slate-800" />
-                    <span className="px-3 text-[10px] font-semibold uppercase text-slate-500 tracking-wider shrink-0">
-                        or register with email
-                    </span>
-                    <hr className="flex-1 border-slate-800" />
-                </div>
-
-                <Form className="flex flex-col gap-5" onSubmit={onSubmit}>
+                  <div
+                    className="flex flex-col gap-4 p-4 rounded-2xl mt-1"
+                    style={{
+                      background: "var(--bg-secondary)",
+                      border: "1px solid var(--border-color)",
+                    }}
+                  >
+                    <div className="flex items-center gap-2">
+                      <div className="w-1 h-4 rounded-full bg-emerald-500" />
+                      <h3 className="text-xs font-bold uppercase tracking-wider text-emerald-500">
+                        Freelancer Profile
+                      </h3>
+                    </div>
+                    <Field
+                      label="Professional Bio"
+                      name="bio"
+                      placeholder="e.g. Full Stack MERN Developer with 5 years experience"
+                    />
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <TextField isRequired name="name" type="text" className="w-full">
-                            <Label className="text-xs font-semibold text-slate-300 mb-1 block">Full Name</Label>
-                            <Input
-                                name="name"
-                                placeholder="Alex Rivers"
-                                className="bg-slate-950/50 border border-slate-800 text-white rounded-lg focus-within:border-emerald-500 transition-all text-sm"
-                            />
-                        </TextField>
-
-                        <TextField
-                            isRequired
-                            name="email"
-                            type="email"
-                            validate={(value) => {
-                                if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(value)) {
-                                    return "Please enter a valid email address";
-                                }
-                                return null;
-                            }}
-                        >
-                            <Label className="text-xs font-semibold text-slate-300 mb-1 block">Email Address</Label>
-                            <Input
-                                name="email"
-                                placeholder="alex@skillswap.com"
-                                className="bg-slate-950/50 border border-slate-800 text-white rounded-lg focus-within:border-emerald-500 transition-all text-sm"
-                            />
-                            <FieldError className="text-xs text-rose-500 mt-1" />
-                        </TextField>
+                      <Field
+                        label="Skills"
+                        name="skills"
+                        placeholder="React, Node.js, Figma"
+                        hint="Separate with commas"
+                      />
+                      <Field
+                        label="Hourly Rate ($)"
+                        name="hourlyRate"
+                        type="number"
+                        placeholder="25"
+                      />
                     </div>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
 
-                    <TextField name="image" type="url">
-                        <Label className="text-xs font-semibold text-slate-300 mb-1 block">Profile Image URL</Label>
-                        <Input
-                            name="image"
-                            placeholder="https://example.com/avatar.jpg"
-                            className="bg-slate-950/50 border border-slate-800 text-white rounded-lg focus-within:border-emerald-500 transition-all text-sm"
-                        />
-                    </TextField>
+            <button
+              type="submit"
+              className="w-full h-11 mt-1 rounded-xl text-sm font-bold text-white transition-all"
+              style={{
+                background: "linear-gradient(135deg, #10b981, #059669)",
+                boxShadow: "0 4px 14px rgba(16,185,129,0.3)",
+              }}
+              onMouseEnter={e => e.currentTarget.style.boxShadow = "0 6px 20px rgba(16,185,129,0.45)"}
+              onMouseLeave={e => e.currentTarget.style.boxShadow = "0 4px 14px rgba(16,185,129,0.3)"}
+            >
+              Create Account →
+            </button>
+          </form>
 
-                    <TextField
-                        isRequired
-                        minLength={6}
-                        name="password"
-                        type="password"
-                        validate={(value) => {
-                            if (value.length < 6) return "Password must be at least 6 characters";
-                            if (!/[A-Z]/.test(value)) return "Password must contain at least one uppercase letter";
-                            if (!/[a-z]/.test(value)) return "Password must contain at least one lowercase letter";
-                            return null;
-                        }}
-                    >
-                        <Label className="text-xs font-semibold text-slate-300 mb-1 block">Password</Label>
-                        <Input
-                            name="password"
-                            placeholder="••••••••"
-                            className="bg-slate-950/50 border border-slate-800 text-white rounded-lg focus-within:border-emerald-500 transition-all text-sm"
-                        />
-                        <Description className="text-[11px] text-slate-500 mt-1 block">
-                            Must be 6+ characters, with uppercase and lowercase letters.
-                        </Description>
-                        <FieldError className="text-xs text-rose-500 mt-1" />
-                    </TextField>
-
-                    {/* Role Selection */}
-                    <div className="flex flex-col gap-2 mt-2">
-                        <Label className="text-xs font-semibold text-slate-300">Choose your primary path</Label>
-
-                        <div className="grid grid-cols-2 gap-4 w-full">
-                            <div
-                                onClick={() => setSelectedRole('client')}
-                                className={`flex items-center justify-center p-3 rounded-xl border transition-all cursor-pointer w-full text-xs sm:text-sm font-semibold select-none
-                                    ${selectedRole === 'client' 
-                                        ? 'bg-emerald-500 border-emerald-500 text-slate-950' 
-                                        : 'bg-slate-950/40 border-slate-800 text-slate-400 hover:border-slate-700'
-                                    }`}
-                            >
-                                <div className="flex items-center justify-center gap-2 pointer-events-none">
-                                    <Briefcase className="h-4 w-4 shrink-0" />
-                                    <span>I'm a Client</span>
-                                </div>
-                            </div>
-
-                            <div
-                                onClick={() => setSelectedRole('freelancer')}
-                                className={`flex items-center justify-center p-3 rounded-xl border transition-all cursor-pointer w-full text-xs sm:text-sm font-semibold select-none
-                                    ${selectedRole === 'freelancer' 
-                                        ? 'bg-emerald-500 border-emerald-500 text-slate-950' 
-                                        : 'bg-slate-950/40 border-slate-800 text-slate-400 hover:border-slate-700'
-                                    }`}
-                            >
-                                <div className="flex items-center justify-center gap-2 pointer-events-none">
-                                    <Person className="h-4 w-4 shrink-0" />
-                                    <span>I'm a Freelancer</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <Description className="text-[10px] text-slate-500 text-center mt-1">
-                            Role selection is available for standard email registration.
-                        </Description>
-                    </div>
-
-                    {selectedRole === 'freelancer' && (
-                        <div className="flex flex-col gap-5 p-4 rounded-xl border border-slate-800 bg-slate-950/30 animate-in fade-in slide-in-from-top-2 duration-300">
-                            <h3 className="text-sm font-bold text-emerald-400 border-b border-slate-800 pb-2">
-                                Freelancer Profile Details
-                            </h3>
-                            
-                            <TextField name="bio" type="text">
-                                <Label className="text-xs font-semibold text-slate-300 mb-1 block">Professional Bio</Label>
-                                <Input
-                                    name="bio"
-                                    placeholder="Briefly describe your expertise (e.g., Full Stack MERN Developer)"
-                                    className="bg-slate-950/50 border border-slate-800 text-white rounded-lg focus-within:border-emerald-500 transition-all text-sm"
-                                />
-                            </TextField>
-
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                <TextField name="skills" type="text">
-                                    <Label className="text-xs font-semibold text-slate-300 mb-1 block">Skills</Label>
-                                    <Input
-                                        name="skills"
-                                        placeholder="React, Node.js, Tailwind"
-                                        className="bg-slate-950/50 border border-slate-800 text-white rounded-lg focus-within:border-emerald-500 transition-all text-sm"
-                                    />
-                                    <Description className="text-[10px] text-slate-500 mt-1">
-                                        Separate with commas.
-                                    </Description>
-                                </TextField>
-
-                                <TextField name="hourlyRate" type="number">
-                                    <Label className="text-xs font-semibold text-slate-300 mb-1 block">Hourly Rate ($)</Label>
-                                    <Input
-                                        name="hourlyRate"
-                                        placeholder="25"
-                                        min="0"
-                                        className="bg-slate-950/50 border border-slate-800 text-white rounded-lg focus-within:border-emerald-500 transition-all text-sm"
-                                    />
-                                </TextField>
-                            </div>
-                        </div>
-                    )}
-
-                    <Button
-                        className="w-full bg-emerald-400 hover:bg-emerald-500 text-slate-950 font-bold h-11 rounded-xl transition-all flex items-center justify-center gap-2 mt-2 shadow-lg shadow-emerald-500/10 text-sm"
-                        type="submit"
-                    >
-                        <span>Create Account</span>
-                        <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                        </svg>
-                    </Button>
-                </Form>
-
-                <div className="text-center mt-6">
-                    <p className="text-xs sm:text-sm text-slate-400">
-                        Already have an account?{" "}
-                        <Link href="/auth/signin" className="text-emerald-400 font-semibold hover:underline transition-all">
-                            Log In
-                        </Link>
-                    </p>
-                </div>
-            </Card>
+          <p className="text-center text-sm mt-6" style={{ color: "var(--text-muted)" }}>
+            Already have an account?{" "}
+            <Link href="/auth/signin" className="text-emerald-500 font-semibold hover:underline">
+              Sign In
+            </Link>
+          </p>
         </div>
-    );
+      </motion.div>
+    </div>
+  );
 }
