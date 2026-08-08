@@ -5,7 +5,8 @@ import { getProposals } from '@/lib/api/proposals';
 
 const page = async () => {
     const user = await getSessionData();
-    const proposals = await getProposals(user?.email);
+    const raw = await getProposals(user?.email);
+    const proposals = Array.isArray(raw) ? raw : Array.isArray(raw?.data) ? raw.data : Array.isArray(raw?.proposals) ? raw.proposals : [];
     return (
         <div>
             <MyProposals proposals={proposals}></MyProposals>

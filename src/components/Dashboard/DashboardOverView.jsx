@@ -1,9 +1,9 @@
+"use client";
 import React from 'react';
-import { motion } from 'framer-motion';
 
 const DashboardOverview = ({ title, description, userName, statsData = [] }) => {
   return (
-    <div className="w-full space-y-6 mb-8">
+    <div className="w-full space-y-5 mb-6">
       {/* Header */}
       <div>
         <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight" style={{ color: "var(--text-heading)" }}>
@@ -23,17 +23,15 @@ const DashboardOverview = ({ title, description, userName, statsData = [] }) => 
         {statsData.map((stat, index) => {
           const IconComponent = stat.icon;
           return (
-            <motion.div
+            <div
               key={index}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4, delay: index * 0.08 }}
-              className="rounded-2xl p-5 flex flex-col justify-between min-h-[130px]"
+              className="rounded-2xl p-5 flex flex-col justify-between min-h-[120px] transition-all duration-200 hover:-translate-y-0.5"
               style={{
                 background: "var(--bg-card)",
                 border: "1px solid var(--border-color)",
                 boxShadow: "var(--shadow-sm)",
                 borderLeft: `4px solid ${stat.accentHex || '#10b981'}`,
+                animationDelay: `${index * 80}ms`,
               }}
             >
               <div className="flex items-center justify-between">
@@ -47,7 +45,7 @@ const DashboardOverview = ({ title, description, userName, statsData = [] }) => 
                   {IconComponent && (
                     <IconComponent
                       className="w-5 h-5"
-                      style={{ color: stat.accentHex || stat.color?.replace('text-', '') || '#10b981' }}
+                      style={{ color: stat.accentHex || '#10b981' }}
                     />
                   )}
                 </div>
@@ -71,7 +69,7 @@ const DashboardOverview = ({ title, description, userName, statsData = [] }) => 
                   {stat.value}
                 </h3>
               </div>
-            </motion.div>
+            </div>
           );
         })}
       </div>

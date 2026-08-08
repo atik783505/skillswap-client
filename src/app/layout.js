@@ -20,18 +20,6 @@ export const metadata = {
     "SkillSwap is a modern freelance marketplace and skill-sharing platform where clients can post tasks and expert freelancers can submit proposals to collaborate and trade skills seamlessly.",
 };
 
-// Inline script to apply saved theme before first paint — prevents FOUC
-const themeScript = `
-(function() {
-  try {
-    var t = localStorage.getItem('theme') || 'dark';
-    document.documentElement.setAttribute('data-theme', t);
-  } catch(e) {
-    document.documentElement.setAttribute('data-theme', 'dark');
-  }
-})();
-`;
-
 export default function RootLayout({ children }) {
   return (
     <html
@@ -39,10 +27,6 @@ export default function RootLayout({ children }) {
       data-theme="dark"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <head>
-        {/* Inline theme script runs synchronously before any render */}
-        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
-      </head>
       <body className="min-h-full flex flex-col" style={{ background: "var(--bg-primary)", color: "var(--text-primary)" }}>
         <AppNavbar />
         <main className="flex-1">{children}</main>
