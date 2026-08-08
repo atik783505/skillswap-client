@@ -3,7 +3,13 @@ import { Chip } from "@heroui/react";
 import React from 'react';
 
 const Transactions = async () => {
-    const transactions = await getTransactions();
+    let transactions = [];
+    try {
+        const res = await getTransactions();
+        transactions = Array.isArray(res) ? res : res?.data || [];
+    } catch (error) {
+        console.error("Failed to fetch transactions:", error);
+    }
 
     return (
         <div className="w-full space-y-6">
@@ -39,42 +45,50 @@ const Transactions = async () => {
                             </tr>
                         </thead>
                         <tbody>
-                            {transactions.map((item) => (
-                                <tr
-                                    key={item._id}
-                                    className="transition-colors"
-                                    style={{ borderBottom: "1px solid var(--border-color)" }}
-                                    onMouseEnter={e => e.currentTarget.style.background = "var(--bg-secondary)"}
-                                    onMouseLeave={e => e.currentTarget.style.background = "transparent"}
-                                >
-                                    <td className="px-5 py-4 text-sm" style={{ color: "var(--text-secondary)" }}>
-                                        {item.client_email}
-                                    </td>
-                                    <td className="px-5 py-4 text-sm" style={{ color: "var(--text-secondary)" }}>
-                                        {item.freelancer_email}
-                                    </td>
-                                    <td className="px-5 py-4 font-bold text-emerald-500 text-sm">
-                                        ${item.amount.toFixed(2)}
-                                    </td>
-                                    <td className="px-5 py-4 text-sm" style={{ color: "var(--text-muted)" }}>
-                                        {new Date(item.paid_at).toLocaleDateString('en-US', {
-                                            year: 'numeric',
-                                            month: 'short',
-                                            day: 'numeric',
-                                        })}
-                                    </td>
-                                    <td className="px-5 py-4">
-                                        <Chip
-                                            color={item.payment_status === 'paid' ? "success" : "warning"}
-                                            variant="flat"
-                                            size="sm"
-                                            className="capitalize"
-                                        >
-                                            {item.payment_status}
-                                        </Chip>
+                            {transactions.length === 0 ? (
+                                <tr>
+                                    <td colSpan={5} className="px-5 py-6 text-center text-sm text-gray-500">
+                                        No transactions found.
                                     </td>
                                 </tr>
-                            ))}
+                            ) : (
+                                transactions.map((item) => (
+                                    <tr
+                                        key={item._id}
+                                        className="transition-colors hover:bg-[var(--bg-secondary)]"
+                                        style={{ borderBottom: "1px solid var(--border-color)" }}
+                                    >
+                                        <td className="px-5 py-4 text-sm" style={{ color: "var(--text-secondary)" }}>
+                                            {item.client_email || 'N/A'}
+                                        </td>
+                                        <td className="px-5 py-4 text-sm" style={{ color: "var(--text-secondary)" }}>
+                                            {item.freelancer_email || 'N/A'}
+                                        </td>
+                                        <td className="px-5 py-4 font-bold text-emerald-500 text-sm">
+                                            ${Number(item.amount || 0).toFixed(2)}
+                                        </td>
+                                        <td className="px-5 py-4 text-sm" style={{ color: "var(--text-muted)" }}>
+                                            {item.paid_at
+                                                ? new Date(item.paid_at).toLocaleDateString('en-US', {
+                                                      year: 'numeric',
+                                                      month: 'short',
+                                                      day: 'numeric',
+                                                  })
+                                                : 'N/A'}
+                                        </td>
+                                        <td className="px-5 py-4">
+                                            <Chip
+                                                color={item.payment_status === 'paid' ? "success" : "warning"}
+                                                variant="flat"
+                                                size="sm"
+                                                className="capitalize"
+                                            >
+                                                {item.payment_status || 'Pending'}
+                                            </Chip>
+                                        </td>
+                                    </tr>
+                                ))
+                            )}
                         </tbody>
                     </table>
                 </div>

@@ -4,10 +4,18 @@ import { getAllTask } from '@/lib/api/tasks';
 import Image from 'next/image';
 
 const ManageAllTask = async ({ searchParams }) => {
-    const params = await searchParams;
-    const currentPage = Number(params.page) || 1;
-    const taskData = await getAllTask(currentPage);
-    const allTask = taskData?.data || [];
+    // Next.js 15 Safe searchParams Resolution
+    const params = searchParams ? await searchParams : {};
+    const currentPage = Number(params?.page) || 1;
+
+    let taskData = null;
+    try {
+        taskData = await getAllTask(currentPage);
+    } catch (error) {
+        console.error("Error fetching tasks:", error);
+    }
+
+    const allTask = Array.isArray(taskData?.data) ? taskData.data : [];
     const totalPages = taskData?.totalPage || 1;
 
     const statusColors = {
@@ -50,54 +58,60 @@ const ManageAllTask = async ({ searchParams }) => {
                             </tr>
                         </thead>
                         <tbody>
-                            {allTask.map((task) => {
-                                const sc = statusColors[task.status] || statusColors.open;
-                                return (
-                                    <tr
-                                        key={task._id}
-                                        className="transition-colors"
-                                        style={{ borderBottom: "1px solid var(--border-color)" }}
-                                        onMouseEnter={e => e.currentTarget.style.background = "var(--bg-secondary)"}
-                                        onMouseLeave={e => e.currentTarget.style.background = "transparent"}
-                                    >
-                                        <td className="px-5 py-4 font-semibold text-sm max-w-xs truncate" style={{ color: "var(--text-heading)" }}>
-                                            {task.title}
-                                        </td>
-                                        <td className="px-5 py-4">
-                                            <div className="flex items-center gap-2.5 whitespace-nowrap">
-                                                {task.clientImage && (
-                                                    <Image
-                                                        src={task.clientImage}
-                                                        alt={task.clientName || "Client"}
-                                                        width={32}
-                                                        height={32}
-                                                        className="w-8 h-8 rounded-full object-cover shrink-0"
-                                                        style={{ border: "1px solid var(--border-color)" }}
-                                                        referrerPolicy="no-referrer"
-                                                    />
-                                                )}
-                                                <span className="text-sm" style={{ color: "var(--text-secondary)" }}>
-                                                    {task.clientName}
+                            {allTask.length === 0 ? (
+                                <tr>
+                                    <td colSpan={5} className="px-5 py-6 text-center text-sm text-gray-500">
+                                        No tasks found.
+                                    </td>
+                                </tr>
+                            ) : (
+                                allTask.map((task) => {
+                                    const sc = statusColors[task?.status] || statusColors.open;
+                                    return (
+                                        <tr
+                                            key={task._id}
+                                            className="transition-colors hover:bg-[var(--bg-secondary)]"
+                                            style={{ borderBottom: "1px solid var(--border-color)" }}
+                                        >
+                                            <td className="px-5 py-4 font-semibold text-sm max-w-xs truncate" style={{ color: "var(--text-heading)" }}>
+                                                {task.title}
+                                            </td>
+                                            <td className="px-5 py-4">
+                                                <div className="flex items-center gap-2.5 whitespace-nowrap">
+                                                    {task.clientImage && (
+                                                        <Image
+                                                            src={task.clientImage}
+                                                            alt={task.clientName || "Client"}
+                                                            width={32}
+                                                            height={32}
+                                                            className="w-8 h-8 rounded-full object-cover shrink-0"
+                                                            style={{ border: "1px solid var(--border-color)" }}
+                                                            referrerPolicy="no-referrer"
+                                                        />
+                                                    )}
+                                                    <span className="text-sm" style={{ color: "var(--text-secondary)" }}>
+                                                        {task.clientName}
+                                                    </span>
+                                                </div>
+                                            </td>
+                                            <td className="px-5 py-4 font-bold text-emerald-500 text-sm">
+                                                ${task.budget}
+                                            </td>
+                                            <td className="px-5 py-4">
+                                                <span
+                                                    className="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider"
+                                                    style={{ background: sc.bg, border: `1px solid ${sc.border}`, color: sc.color }}
+                                                >
+                                                    {task.status}
                                                 </span>
-                                            </div>
-                                        </td>
-                                        <td className="px-5 py-4 font-bold text-emerald-500 text-sm">
-                                            ${task.budget}
-                                        </td>
-                                        <td className="px-5 py-4">
-                                            <span
-                                                className="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider"
-                                                style={{ background: sc.bg, border: `1px solid ${sc.border}`, color: sc.color }}
-                                            >
-                                                {task.status}
-                                            </span>
-                                        </td>
-                                        <td className="px-5 py-4 text-right">
-                                            <DeleteTaskButton id={task._id} />
-                                        </td>
-                                    </tr>
-                                );
-                            })}
+                                            </td>
+                                            <td className="px-5 py-4 text-right">
+                                                <DeleteTaskButton id={task._id} />
+                                            </td>
+                                        </tr>
+                                    );
+                                })
+                            )}
                         </tbody>
                     </table>
                 </div>
