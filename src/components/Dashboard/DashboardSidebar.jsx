@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Avatar, Button, Drawer } from "@heroui/react";
+import { Avatar } from "@heroui/react";
 import { useSession, authClient } from "@/lib/auth-client";
 import {
   LuLayoutDashboard, LuClipboardPlus, LuClipboardList,
@@ -13,8 +13,8 @@ import { PersonPencil } from '@gravity-ui/icons';
 import toast from 'react-hot-toast';
 import ThemeToggle from '@/components/ThemeToggle';
 
-const Logo = () => (
-  <Link href='/' className="flex items-center gap-2.5 group">
+const Logo = ({ onClick }) => (
+  <Link href='/' onClick={onClick} className="flex items-center gap-2.5 group">
     <div className="p-1.5 rounded-lg" style={{ background: "rgba(16,185,129,0.12)", border: "1px solid rgba(16,185,129,0.2)" }}>
       <svg className="h-4 w-4 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
@@ -56,7 +56,7 @@ function getFallbackText(name) {
   return name.slice(0, 2).toUpperCase();
 }
 
-function NavLinks({ items, pathname }) {
+function NavLinks({ items, pathname, onItemClick }) {
   return (
     <nav className="flex-1 space-y-1 w-full px-3">
       {items.map((item) => {
@@ -66,7 +66,8 @@ function NavLinks({ items, pathname }) {
           <Link
             key={item.href}
             href={item.href}
-            className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all duration-150"
+            onClick={onItemClick}
+            className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all duration-150 cursor-pointer"
             style={
               isActive
                 ? {
@@ -79,18 +80,6 @@ function NavLinks({ items, pathname }) {
                     border: "1px solid transparent",
                   }
             }
-            onMouseEnter={e => {
-              if (!isActive) {
-                e.currentTarget.style.background = "var(--bg-secondary)";
-                e.currentTarget.style.color = "var(--text-primary)";
-              }
-            }}
-            onMouseLeave={e => {
-              if (!isActive) {
-                e.currentTarget.style.background = "transparent";
-                e.currentTarget.style.color = "var(--text-secondary)";
-              }
-            }}
           >
             <Icon
               className="text-base shrink-0"
@@ -131,7 +120,7 @@ function UserFooter({ user, onSignOut }) {
         <button
           onClick={onSignOut}
           title="Sign out"
-          className="p-1.5 rounded-lg transition-colors text-rose-400 hover:bg-rose-500/10"
+          className="p-1.5 rounded-lg transition-colors text-rose-400 hover:bg-rose-500/10 cursor-pointer"
         >
           <LuLogOut className="text-base" />
         </button>
@@ -144,13 +133,11 @@ export function DashboardSidebar() {
   const pathname = usePathname();
   const { data: session } = useSession();
   const [isOpen, setIsOpen] = useState(false);
-  const [drawerKey, setDrawerKey] = useState(0);
   const user = session?.user;
 
+  // URL পরিবর্তন হলেই মোবাইল সাইডবার বন্ধ হবে
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     setIsOpen(false);
-    setDrawerKey(prev => prev + 1);
   }, [pathname]);
 
   const handleSignOut = async () => {
@@ -161,41 +148,9 @@ export function DashboardSidebar() {
 
   const menuItems = navLinkMap[user?.role || 'client'];
 
-  const sidebarContent = (
-    <div className="flex flex-col h-full py-5">
-      <div className="px-4 mb-7">
-        <Logo />
-      </div>
-
-      {/* Role badge */}
-      {user?.role && (
-        <div className="px-4 mb-5">
-          <span
-            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-widest"
-            style={{
-              background: "rgba(16,185,129,0.08)",
-              border: "1px solid rgba(16,185,129,0.15)",
-              color: "#10b981",
-            }}
-          >
-            {user.role} Dashboard
-          </span>
-        </div>
-      )}
-
-      <NavLinks items={menuItems} pathname={pathname} />
-
-      <div className="px-4 mt-4">
-        <ThemeToggle />
-      </div>
-
-      {user && <UserFooter user={user} onSignOut={handleSignOut} />}
-    </div>
-  );
-
   return (
     <>
-      {/* Mobile topbar */}
+      {/* Mobile Topbar */}
       <div
         className="md:hidden fixed top-0 left-0 w-full h-14 px-4 flex items-center justify-between z-40 backdrop-blur-md"
         style={{
@@ -208,50 +163,73 @@ export function DashboardSidebar() {
           <ThemeToggle />
           <button
             onClick={() => setIsOpen(true)}
-            className="p-2 rounded-xl transition-colors"
+            className="p-2 rounded-xl transition-colors cursor-pointer"
             style={{ color: "var(--text-secondary)", background: "var(--bg-secondary)" }}
             aria-label="Open menu"
           >
             <LuMenu className="w-5 h-5" />
           </button>
         </div>
-
-        <Drawer key={drawerKey} isOpen={isOpen} onOpenChange={setIsOpen}>
-          <Drawer.Backdrop />
-          <Drawer.Content
-            placement="left"
-            className="max-w-[270px]"
-            style={{ background: "var(--bg-primary)", borderRight: "1px solid var(--border-color)" }}
-          >
-            <Drawer.Dialog className="flex flex-col h-full">
-              <div className="flex items-center justify-between px-5 pt-5 pb-2">
-                <Logo />
-                <button
-                  onClick={() => setIsOpen(false)}
-                  className="p-1.5 rounded-lg transition-colors"
-                  style={{ color: "var(--text-muted)", background: "var(--bg-secondary)" }}
-                >
-                  <LuX className="w-4 h-4" />
-                </button>
-              </div>
-              {user?.role && (
-                <div className="px-5 mb-4">
-                  <span
-                    className="inline-flex items-center px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-widest"
-                    style={{ background: "rgba(16,185,129,0.08)", border: "1px solid rgba(16,185,129,0.15)", color: "#10b981" }}
-                  >
-                    {user.role} Dashboard
-                  </span>
-                </div>
-              )}
-              <NavLinks items={menuItems} pathname={pathname} />
-              {user && <UserFooter user={user} onSignOut={handleSignOut} />}
-            </Drawer.Dialog>
-          </Drawer.Content>
-        </Drawer>
       </div>
 
-      {/* Desktop sidebar */}
+      {/* Pure CSS Mobile Drawer Overlay */}
+      {isOpen && (
+        <div className="md:hidden fixed inset-0 z-50 flex">
+          {/* Backdrop (Backdrop-এ ক্লিক করলে বন্ধ হবে) */}
+          <div 
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity" 
+            onClick={() => setIsOpen(false)}
+          />
+
+          {/* Drawer Sidebar Box */}
+          <div 
+            className="relative w-[270px] max-w-[80vw] h-full flex flex-col py-5 z-10 shadow-2xl transition-transform"
+            style={{ background: "var(--bg-primary)", borderRight: "1px solid var(--border-color)" }}
+          >
+            {/* Header / Close Button */}
+            <div className="flex items-center justify-between px-5 mb-6">
+              <Logo onClick={() => setIsOpen(false)} />
+              <button
+                onClick={() => setIsOpen(false)}
+                className="p-1.5 rounded-lg transition-colors cursor-pointer"
+                style={{ color: "var(--text-muted)", background: "var(--bg-secondary)" }}
+              >
+                <LuX className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Role Badge */}
+            {user?.role && (
+              <div className="px-5 mb-4">
+                <span
+                  className="inline-flex items-center px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-widest"
+                  style={{ background: "rgba(16,185,129,0.08)", border: "1px solid rgba(16,185,129,0.15)", color: "#10b981" }}
+                >
+                  {user.role} Dashboard
+                </span>
+              </div>
+            )}
+
+            {/* Navigation Links */}
+            <div className="flex-1 overflow-y-auto">
+              <NavLinks 
+                items={menuItems} 
+                pathname={pathname} 
+                onItemClick={() => setIsOpen(false)} 
+              />
+            </div>
+
+            <div className="px-5 my-3">
+              <ThemeToggle />
+            </div>
+
+            {/* Footer */}
+            {user && <UserFooter user={user} onSignOut={handleSignOut} />}
+          </div>
+        </div>
+      )}
+
+      {/* Desktop Sidebar */}
       <aside
         className="hidden md:flex w-64 flex-col h-screen sticky top-0 shrink-0"
         style={{
@@ -259,10 +237,37 @@ export function DashboardSidebar() {
           borderRight: "1px solid var(--sidebar-border)",
         }}
       >
-        {sidebarContent}
+        <div className="flex flex-col h-full py-5">
+          <div className="px-4 mb-7">
+            <Logo />
+          </div>
+
+          {user?.role && (
+            <div className="px-4 mb-5">
+              <span
+                className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-widest"
+                style={{
+                  background: "rgba(16,185,129,0.08)",
+                  border: "1px solid rgba(16,185,129,0.15)",
+                  color: "#10b981",
+                }}
+              >
+                {user.role} Dashboard
+              </span>
+            </div>
+          )}
+
+          <NavLinks items={menuItems} pathname={pathname} />
+
+          <div className="px-4 mt-4">
+            <ThemeToggle />
+          </div>
+
+          {user && <UserFooter user={user} onSignOut={handleSignOut} />}
+        </div>
       </aside>
 
-      {/* Mobile spacer */}
+      {/* Mobile topbar spacing */}
       <div className="md:hidden h-14 w-full" />
     </>
   );
