@@ -15,9 +15,11 @@ const AllTasks = async ({ searchParams }) => {
     const totalPages = taskData?.totalPage || 1;
    
     return (
-        <div className="w-full bg-slate-950 p-6 md:p-10 min-h-screen">
+        /* bg-slate-950 সরিয়ে theme-bg-primary দেওয়া হয়েছে */
+        <div className="w-full theme-bg-primary theme-text-primary p-6 md:p-10 min-h-screen">
             <div className="max-w-7xl mx-auto">
-                <h2 className="text-2xl font-bold text-slate-100 mb-6">All Tasks</h2>
+                {/* text-slate-100 সরিয়ে theme-text-primary ব্যবহার করা হয়েছে */}
+                <h2 className="text-2xl font-bold theme-text-primary mb-6">All Tasks</h2>
 
                 <TaskFilters />
 
@@ -28,7 +30,8 @@ const AllTasks = async ({ searchParams }) => {
                 </div>
 
                 {tasks.length === 0 && (
-                    <p className="text-slate-500 text-center mt-20">No tasks found matching your criteria.</p>
+                    /* text-slate-500 সরিয়ে theme-text-muted দেওয়া হয়েছে */
+                    <p className="theme-text-muted text-center mt-20">No tasks found matching your criteria.</p>
                 )}
             </div>
             <div className="mt-10">
