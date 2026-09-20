@@ -15,7 +15,6 @@ const AllTasks = async ({ searchParams }) => {
     const totalPages = taskData?.totalPage || 1;
    
     return (
-        /* bg-slate-950 সরিয়ে theme-bg-primary দেওয়া হয়েছে */
         <div className="w-full theme-bg-primary theme-text-primary p-6 md:p-10 min-h-screen">
             <div className="max-w-7xl mx-auto">
                 {/* text-slate-100 সরিয়ে theme-text-primary ব্যবহার করা হয়েছে */}
