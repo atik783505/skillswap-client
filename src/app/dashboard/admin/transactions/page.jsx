@@ -2,6 +2,8 @@ import { getTransactions } from '@/lib/api/admin';
 import { Chip } from "@heroui/react";
 import React from 'react';
 
+export const dynamic = 'force-dynamic';
+
 const Transactions = async () => {
     let transactions = [];
     try {
