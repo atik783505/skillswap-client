@@ -2,23 +2,21 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
-function getStoredTheme() {
-  if (typeof window === "undefined") return "dark";
-  return localStorage.getItem("theme") || "dark";
-}
-
 export default function ThemeToggle() {
-  // Initialise from localStorage so first render is correct after hydration
-  const [theme, setTheme] = useState(getStoredTheme);
+  // Start with "dark" on server, sync from DOM on client before paint
+  const [theme, setTheme] = useState("dark");
 
-  // Keep the DOM attribute in sync after every toggle
   useEffect(() => {
-    document.documentElement.setAttribute("data-theme", theme);
-    localStorage.setItem("theme", theme);
-  }, [theme]);
+    // Read the value that the inline script already applied to <html>
+    const current = document.documentElement.getAttribute("data-theme") || "dark";
+    setTheme(current);
+  }, []);
 
   const toggle = () => {
-    setTheme(prev => (prev === "dark" ? "light" : "dark"));
+    const next = theme === "dark" ? "light" : "dark";
+    document.documentElement.setAttribute("data-theme", next);
+    localStorage.setItem("theme", next);
+    setTheme(next);
   };
 
   return (
@@ -38,7 +36,7 @@ export default function ThemeToggle() {
             initial={{ rotate: -90, opacity: 0, scale: 0.5 }}
             animate={{ rotate: 0, opacity: 1, scale: 1 }}
             exit={{ rotate: 90, opacity: 0, scale: 0.5 }}
-            transition={{ duration: 0.2 }}
+            transition={{ duration: 0.18 }}
             xmlns="http://www.w3.org/2000/svg"
             className="w-4 h-4 text-amber-400"
             fill="none"
@@ -56,7 +54,7 @@ export default function ThemeToggle() {
             initial={{ rotate: 90, opacity: 0, scale: 0.5 }}
             animate={{ rotate: 0, opacity: 1, scale: 1 }}
             exit={{ rotate: -90, opacity: 0, scale: 0.5 }}
-            transition={{ duration: 0.2 }}
+            transition={{ duration: 0.18 }}
             xmlns="http://www.w3.org/2000/svg"
             className="w-4 h-4 text-slate-500"
             fill="none"

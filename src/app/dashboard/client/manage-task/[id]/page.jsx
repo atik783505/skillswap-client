@@ -1,179 +1,238 @@
 import { getTask } from '@/lib/api/tasks';
+import { getTaskProposals } from '@/lib/api/proposals';
 import React from 'react';
 import Link from 'next/link';
-import { Card, Button } from '@heroui/react';
 import { Calendar, CircleDollar, ArrowLeft, Tag, Link as LinkIcon } from '@gravity-ui/icons';
-import { getTaskProposals } from '@/lib/api/proposals';
+
+const statusConfig = {
+    open:        { bg: "rgba(16,185,129,0.08)",  border: "rgba(16,185,129,0.25)",  color: "#10b981" },
+    'in progress':{ bg: "rgba(56,189,248,0.08)", border: "rgba(56,189,248,0.25)", color: "#38bdf8" },
+    completed:   { bg: "rgba(139,92,246,0.1)",   border: "rgba(139,92,246,0.3)",  color: "#8b5cf6" },
+};
+
+const proposalStatusConfig = {
+    accepted: { bg: "rgba(16,185,129,0.08)",  border: "rgba(16,185,129,0.25)",  color: "#10b981" },
+    rejected: { bg: "rgba(244,63,94,0.08)",   border: "rgba(244,63,94,0.25)",   color: "#f43f5e" },
+    pending:  { bg: "rgba(245,158,11,0.08)",  border: "rgba(245,158,11,0.25)",  color: "#f59e0b" },
+};
 
 const TaskDetails = async ({ params }) => {
     const { id } = await params;
     const task = await getTask(id);
-    const proposals = await getTaskProposals(id);
+    const rawProposals = await getTaskProposals(id);
+    const proposals = Array.isArray(rawProposals) ? rawProposals
+        : Array.isArray(rawProposals?.data) ? rawProposals.data
+        : [];
 
-    const getStatusClass = (status) => {
-        const statusClasses = {
-            'open': 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20',
-            'in progress': 'bg-cyan-500/10 text-cyan-400 border border-cyan-500/20',
-            'completed': 'bg-emerald-500 text-slate-950 font-bold'
-        };
-        return statusClasses[status?.toLowerCase()] || 'bg-purple-500/10 text-purple-400 border border-purple-500/20';
-    };
+    const sc = statusConfig[task?.status?.toLowerCase()] || statusConfig.open;
 
     return (
-        <div className="w-full bg-slate-950 p-4 md:p-8 min-h-screen text-slate-100">
-            <div className="w-full max-w-4xl mx-auto flex flex-col gap-6">
+        <div className="w-full space-y-6">
+            {/* Back */}
+            <Link
+                href="/dashboard/client/manage-task"
+                className="inline-flex items-center gap-2 text-sm font-medium transition-colors hover:text-emerald-500"
+                style={{ color: "var(--text-secondary)" }}
+            >
+                <ArrowLeft className="w-4 h-4" />
+                Back to Tasks
+            </Link>
 
-                <div className="flex items-center justify-between">
-                    <Link href="/dashboard/client/manage-task">
-                        <Button
-                            size="sm"
-                            variant="light"
-                            className="text-slate-400 hover:text-slate-200 hover:bg-slate-900 rounded-xl gap-2 transition-all"
-                        >
-                            <ArrowLeft className="w-4 h-4" />
-                            Back to Tasks
-                        </Button>
-                    </Link>
+            {/* Task card */}
+            <div
+                className="rounded-2xl p-6 sm:p-8"
+                style={{ background: "var(--bg-card)", border: "1px solid var(--border-color)", boxShadow: "var(--shadow-sm)" }}
+            >
+                {/* Header */}
+                <div
+                    className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 pb-5 mb-5"
+                    style={{ borderBottom: "1px solid var(--border-color)" }}
+                >
+                    <div className="space-y-1.5">
+                        <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight" style={{ color: "var(--text-heading)" }}>
+                            {task?.title || 'Untitled Task'}
+                        </h1>
+                        <p className="text-xs" style={{ color: "var(--text-muted)" }}>Task ID: {id}</p>
+                    </div>
+                    <span
+                        className="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider shrink-0"
+                        style={{ background: sc.bg, border: `1px solid ${sc.border}`, color: sc.color }}
+                    >
+                        {task?.status || 'open'}
+                    </span>
                 </div>
 
-                <Card className="w-full rounded-2xl border border-slate-900 bg-slate-900/40 backdrop-blur-md p-6 md:p-8 shadow-2xl flex flex-col gap-6">
-
-                    <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 pb-6 border-b border-slate-900">
-                        <div className="flex flex-col gap-2">
-                            <h1 className="text-2xl md:text-3xl font-bold text-slate-100 tracking-tight leading-tight">
-                                {task?.title || 'Loading Task Title...'}
-                            </h1>
-                            <p className="text-xs text-slate-500">Task ID: {id}</p>
+                {/* Meta row */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+                    <div
+                        className="flex items-center gap-4 p-4 rounded-xl"
+                        style={{ background: "var(--bg-secondary)", border: "1px solid var(--border-color)" }}
+                    >
+                        <div className="p-3 rounded-xl" style={{ background: "rgba(139,92,246,0.1)", border: "1px solid rgba(139,92,246,0.2)" }}>
+                            <CircleDollar className="w-5 h-5 text-purple-500" />
                         </div>
-
                         <div>
-                            <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${getStatusClass(task?.status)}`}>
-                                {task?.status || 'open'}
-                            </span>
-                        </div>
-                    </div>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div className="flex items-center gap-4 p-4 rounded-xl border border-slate-900/60 bg-slate-900/20">
-                            <div className="p-3 rounded-lg bg-purple-500/10 text-purple-400 border border-purple-500/20">
-                                <CircleDollar className="w-5 h-5" />
-                            </div>
-                            <div className="flex flex-col">
-                                <span className="text-xs text-slate-500 font-medium uppercase tracking-wider">Budget</span>
-                                <span className="text-lg font-bold text-slate-200">
-                                    ${task?.budget ? Number(task.budget).toLocaleString('en-US', { minimumFractionDigits: 2 }) : '0.00'}
-                                </span>
-                            </div>
-                        </div>
-
-                        <div className="flex items-center gap-4 p-4 rounded-xl border border-slate-900/60 bg-slate-900/20">
-                            <div className="p-3 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                                <Calendar className="w-5 h-5" />
-                            </div>
-                            <div className="flex flex-col">
-                                <span className="text-xs text-slate-500 font-medium uppercase tracking-wider">Deadline</span>
-                                <span className="text-lg font-bold text-slate-200">
-                                    {task?.deadline || 'No deadline set'}
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-
-                    {task?.deliverable_url && (
-                        <div className="flex flex-col gap-3 p-5 rounded-xl border border-emerald-500/30 bg-emerald-500/5 mt-2">
-                            <h3 className="text-sm font-semibold text-emerald-400 uppercase tracking-wider flex items-center gap-2">
-                                <LinkIcon className="w-4 h-4" />
-                                Submitted Work Deliverable
-                            </h3>
-                            <p className="text-xs text-slate-400">
-                                The freelancer has marked this project as complete. You can review the submission using the link below:
+                            <p className="text-[10px] font-bold uppercase tracking-widest mb-0.5" style={{ color: "var(--text-muted)" }}>Budget</p>
+                            <p className="text-lg font-extrabold text-emerald-500">
+                                ${task?.budget ? Number(task.budget).toLocaleString('en-US', { minimumFractionDigits: 2 }) : '0.00'}
                             </p>
-                            <a 
-                                href={task.deliverable_url} 
-                                target="_blank" 
-                                rel="noopener noreferrer"
-                                className="text-sm text-emerald-400 hover:text-emerald-300 underline font-medium break-all mt-1"
-                            >
-                                {task.deliverable_url}
-                            </a>
                         </div>
-                    )}
+                    </div>
+                    <div
+                        className="flex items-center gap-4 p-4 rounded-xl"
+                        style={{ background: "var(--bg-secondary)", border: "1px solid var(--border-color)" }}
+                    >
+                        <div className="p-3 rounded-xl" style={{ background: "rgba(16,185,129,0.1)", border: "1px solid rgba(16,185,129,0.2)" }}>
+                            <Calendar className="w-5 h-5 text-emerald-500" />
+                        </div>
+                        <div>
+                            <p className="text-[10px] font-bold uppercase tracking-widest mb-0.5" style={{ color: "var(--text-muted)" }}>Deadline</p>
+                            <p className="text-lg font-bold" style={{ color: "var(--text-heading)" }}>
+                                {task?.deadline || 'Not set'}
+                            </p>
+                        </div>
+                    </div>
+                </div>
 
-                    <div className="flex flex-col gap-3 mt-2">
-                        <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-2">
-                            <Tag className="w-4 h-4 text-purple-400" />
-                            Task Description
+                {/* Deliverable */}
+                {task?.deliverable_url && (
+                    <div
+                        className="flex flex-col gap-2.5 p-5 rounded-xl mb-5"
+                        style={{ background: "rgba(16,185,129,0.05)", border: "1px solid rgba(16,185,129,0.3)" }}
+                    >
+                        <h3 className="text-sm font-bold text-emerald-500 flex items-center gap-2 uppercase tracking-wider">
+                            <LinkIcon className="w-4 h-4" />
+                            Submitted Deliverable
                         </h3>
-                        <div className="p-5 rounded-xl border border-slate-900 bg-slate-950/40 text-slate-300 leading-relaxed text-sm whitespace-pre-wrap">
-                            {task?.description || 'No description provided for this task.'}
-                        </div>
+                        <p className="text-xs" style={{ color: "var(--text-muted)" }}>
+                            The freelancer has marked this task complete. Review the submission below:
+                        </p>
+                        <a
+                            href={task.deliverable_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-sm text-emerald-500 hover:text-emerald-600 underline font-medium break-all"
+                        >
+                            {task.deliverable_url}
+                        </a>
                     </div>
+                )}
 
-                    <div className="mt-4 pt-6 border-t border-slate-900 text-center text-xs text-slate-600 italic">
-                        Additional details and management options can be added here in the future.
+                {/* Description */}
+                <div>
+                    <h3 className="text-sm font-bold uppercase tracking-wider flex items-center gap-2 mb-3" style={{ color: "var(--text-muted)" }}>
+                        <Tag className="w-4 h-4 text-purple-500" />
+                        Task Description
+                    </h3>
+                    <div
+                        className="p-5 rounded-xl text-sm leading-relaxed whitespace-pre-wrap"
+                        style={{
+                            background: "var(--bg-secondary)",
+                            border: "1px solid var(--border-color)",
+                            color: "var(--text-secondary)",
+                        }}
+                    >
+                        {task?.description || 'No description provided.'}
                     </div>
-
-                </Card>
+                </div>
             </div>
-            <div className="w-full max-w-4xl mx-auto mt-8">
-                <h2 className="text-xl font-bold text-slate-100 mb-4 flex items-center gap-2">
-                    Proposals ({proposals?.length || 0})
+
+            {/* Proposals section */}
+            <div className="space-y-4">
+                <h2 className="text-xl font-bold flex items-center gap-2" style={{ color: "var(--text-heading)" }}>
+                    Proposals
+                    <span
+                        className="text-sm px-2.5 py-0.5 rounded-full font-bold"
+                        style={{ background: "rgba(16,185,129,0.1)", color: "#10b981" }}
+                    >
+                        {proposals.length}
+                    </span>
                 </h2>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {proposals?.map((proposal) => (
-                        <Card key={proposal._id} className="p-5 border border-slate-900 bg-slate-900/40 rounded-xl shadow-none">
-                            <div className="flex flex-col gap-3">
-                                <div className="flex justify-between items-start">
-                                    <div>
-                                        <p className="font-semibold text-slate-200 truncate max-w-[200px]">{proposal.freelancerEmail}</p>
-                                        <p className="text-xs text-slate-500">Submitted: {new Date(proposal.createdAt).toLocaleDateString()}</p>
-                                    </div>
-
-                                    <span className={`text-[10px] px-2 py-1 uppercase tracking-wider font-bold rounded-sm ${proposal.status === 'accepted' ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/20' :
-                                        proposal.status === 'rejected' ? 'bg-red-500/20 text-red-400 border border-red-500/20' :
-                                            'bg-amber-500/20 text-amber-400 border border-amber-500/20'
-                                        }`}>
-                                        {proposal.status}
-                                    </span>
-                                </div>
-
-                                <div className="flex gap-4 text-sm text-slate-400">
-                                    <p>Bid: <span className="text-white font-bold">${proposal.proposedBudget}</span></p>
-                                    <p>Time: <span className="text-white font-bold">{proposal.estimatedDays} Days</span></p>
-                                </div>
-
-                                <p className="text-sm text-slate-400 italic bg-slate-950/50 p-3 border border-slate-800 rounded-lg">
-                                    {proposal.coverNote}
-                                </p>
-
-                                {proposal.status === 'pending' && (
-                                    <div className="flex gap-2 mt-2">
-                                        <form action={'/api/payment'} method="POST" className="flex gap-2 w-full">
-                                            <input type="hidden" name="task_id" value={id} />
-                                            <input type="hidden" name="task_title" value={task.title} />
-                                            <input type="hidden" name="client_email" value={task.clientEmail} />
-                                            <input type="hidden" name="freelancer_email" value={proposal.freelancerEmail} />
-                                            <input type="hidden" name="amount" value={proposal.proposedBudget} />
-                                            <input type="hidden" name="proposal_id" value={proposal._id.toString()} />
-
-                                            <Button type='submit' size="sm" className="bg-emerald-600 text-white rounded-xl w-full hover:bg-emerald-700 font-semibold">
-                                                Accept
-                                            </Button>
-                                        </form>
-                                        <Button size="sm" className="bg-transparent border border-pink-500 text-pink-500 rounded-xl w-full hover:bg-pink-500/10 font-semibold" variant="bordered">
-                                            Reject
-                                        </Button>
-                                    </div>
-                                )}
-                            </div>
-                        </Card>
-                    ))}
-                </div>
-
-                {proposals?.length === 0 && (
-                    <div className="p-8 border border-dashed border-slate-800 text-center text-slate-600 rounded-xl">
+                {proposals.length === 0 ? (
+                    <div
+                        className="rounded-2xl p-10 text-center text-sm"
+                        style={{ border: "1px dashed var(--border-color)", color: "var(--text-muted)" }}
+                    >
                         No proposals received yet.
+                    </div>
+                ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {proposals.map((proposal) => {
+                            const ps = proposalStatusConfig[proposal.status] || proposalStatusConfig.pending;
+                            return (
+                                <div
+                                    key={proposal._id}
+                                    className="rounded-2xl p-5 flex flex-col gap-4"
+                                    style={{ background: "var(--bg-card)", border: "1px solid var(--border-color)", boxShadow: "var(--shadow-sm)" }}
+                                >
+                                    <div className="flex items-start justify-between gap-3">
+                                        <div>
+                                            <p className="font-semibold text-sm truncate max-w-[200px]" style={{ color: "var(--text-heading)" }}>
+                                                {proposal.freelancerEmail}
+                                            </p>
+                                            <p className="text-xs mt-0.5" style={{ color: "var(--text-muted)" }}>
+                                                {new Date(proposal.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                                            </p>
+                                        </div>
+                                        <span
+                                            className="text-[10px] px-2.5 py-1 rounded-full font-bold uppercase tracking-wider shrink-0"
+                                            style={{ background: ps.bg, border: `1px solid ${ps.border}`, color: ps.color }}
+                                        >
+                                            {proposal.status}
+                                        </span>
+                                    </div>
+
+                                    <div className="flex gap-4 text-sm">
+                                        <div>
+                                            <span className="text-xs font-bold uppercase tracking-wider block mb-0.5" style={{ color: "var(--text-muted)" }}>Bid</span>
+                                            <span className="font-extrabold text-emerald-500">${proposal.proposedBudget}</span>
+                                        </div>
+                                        <div>
+                                            <span className="text-xs font-bold uppercase tracking-wider block mb-0.5" style={{ color: "var(--text-muted)" }}>Days</span>
+                                            <span className="font-bold" style={{ color: "var(--text-heading)" }}>{proposal.estimatedDays}</span>
+                                        </div>
+                                    </div>
+
+                                    <p
+                                        className="text-sm leading-relaxed italic p-3.5 rounded-xl"
+                                        style={{ background: "var(--bg-secondary)", border: "1px solid var(--border-color)", color: "var(--text-secondary)" }}
+                                    >
+                                        {proposal.coverNote}
+                                    </p>
+
+                                    {proposal.status === 'pending' && (
+                                        <div className="flex gap-2.5 mt-1">
+                                            <form action="/api/payment" method="POST" className="flex-1">
+                                                <input type="hidden" name="task_id" value={id} />
+                                                <input type="hidden" name="task_title" value={task?.title} />
+                                                <input type="hidden" name="client_email" value={task?.clientEmail} />
+                                                <input type="hidden" name="freelancer_email" value={proposal.freelancerEmail} />
+                                                <input type="hidden" name="amount" value={proposal.proposedBudget} />
+                                                <input type="hidden" name="proposal_id" value={proposal._id.toString()} />
+                                                <button
+                                                    type="submit"
+                                                    className="w-full h-9 rounded-xl text-sm font-bold text-white transition-all"
+                                                    style={{ background: "#10b981" }}
+                                                >
+                                                    Accept & Pay
+                                                </button>
+                                            </form>
+                                            <button
+                                                className="flex-1 h-9 rounded-xl text-sm font-bold transition-all"
+                                                style={{
+                                                    background: "rgba(244,63,94,0.08)",
+                                                    border: "1px solid rgba(244,63,94,0.25)",
+                                                    color: "#f43f5e",
+                                                }}
+                                            >
+                                                Reject
+                                            </button>
+                                        </div>
+                                    )}
+                                </div>
+                            );
+                        })}
                     </div>
                 )}
             </div>

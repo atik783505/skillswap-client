@@ -2,7 +2,10 @@ import { getAllFreelancer } from '@/lib/api/proposals';
 import { Card, Avatar, Button, Chip, Link } from "@heroui/react";
 
 const FreelancerProfile = async () => {
-    const freelancers = await getAllFreelancer();
+    const raw = await getAllFreelancer();
+    const freelancers = Array.isArray(raw) ? raw
+        : Array.isArray(raw?.data) ? raw.data
+        : [];
 
     return (
         <div className="px-4 py-10 theme-bg-primary">
